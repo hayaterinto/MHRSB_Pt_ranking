@@ -5,98 +5,170 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>モンハンサンブレイクポイントランキング</title>
     <style>
-        body { font-family: sans-serif; line-height: 1.6; background: #1a1a1a; color: #ecf0f1; padding: 10px; }
-        .container { max-width: 1000px; margin: auto; background: #2c3e50; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        h1 { text-align: center; color: #f1c40f; text-shadow: 1px 1px 2px #000; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; background: #121212; color: #ecf0f1; padding: 10px; }
+        .container { max-width: 1000px; margin: auto; background: #2c3e50; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
         
-        .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
-        button { padding: 12px 20px; cursor: pointer; border: none; border-radius: 5px; background: #95a5a6; color: white; font-weight: bold; transition: 0.3s; }
-        button.active { background: #e67e22; box-shadow: 0 0 10px #e67e22; }
+        /* タイトルエリア */
+        .header-area { text-align: center; margin-bottom: 30px; }
+        h1 { color: #f1c40f; font-size: 2.2em; margin-bottom: 5px; text-shadow: 2px 2px 4px #000; }
+        .sub-title { color: #e67e22; font-size: 1.8em; font-weight: bold; display: block; }
         
-        .table-wrapper { overflow-x: auto; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; background: #fff; color: #333; min-width: 600px; }
-        th, td { padding: 10px; border: 1px solid #bdc3c7; text-align: center; }
-        th { background: #c0392b; color: white; position: sticky; top: 0; }
+        /* 部門切り替えボタン */
+        .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; justify-content: center; }
+        .tab-btn { padding: 15px 25px; cursor: pointer; border: 2px solid #e67e22; border-radius: 50px; background: transparent; color: #e67e22; font-weight: bold; font-size: 1.1em; transition: 0.3s; }
+        .tab-btn.active { background: #e67e22; color: white; }
         
-        /* 1〜3位の色付け */
-        .rank-1 { background: #fff4d1; font-weight: bold; }
+        /* 絞り込みチェックボックス */
+        .filter-area { background: #34495e; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 30px; border: 1px solid #444; }
+        .filter-area label { margin: 0 15px; font-weight: bold; font-size: 1.1em; cursor: pointer; display: inline-block; }
+        .filter-area input { transform: scale(1.5); margin-right: 8px; vertical-align: middle; }
+
+        /* 部門タイトル */
+        #current-dept { text-align: center; color: #f39c12; font-size: 2.5em; margin: 40px 0 20px 0; border-bottom: 3px double #f39c12; display: inline-block; width: 100%; }
+
+        /* セクション・形式タイトル */
+        .section-title { background: #c0392b; color: white; padding: 10px; margin-top: 50px; text-align: center; font-size: 1.5em; font-weight: bold; border-radius: 5px; }
+        .mode-title { text-align: center; font-size: 2em; font-weight: bold; color: #fff; margin: 30px 0 10px 0; display: block; }
+        
+        /* テーブルスタイル */
+        .table-wrapper { overflow-x: auto; margin-bottom: 40px; }
+        table { width: 100%; border-collapse: collapse; background: #fff; color: #333; min-width: 600px; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px; border: 1px solid #bdc3c7; text-align: center; }
+        th { background: #34495e; color: white; font-size: 1.1em; }
+        
+        /* 順位の装飾 */
+        .rank-1 { background: #fff4d1; font-weight: bold; border: 2px solid #f1c40f; }
         .rank-2 { background: #f0f0f0; }
         .rank-3 { background: #ffebd1; }
+        .rank-num { font-size: 1.2em; font-weight: bold; }
         
-        .section-title { background: #34495e; color: #f1c40f; padding: 8px; margin-top: 30px; border-left: 5px solid #e67e22; font-size: 1.2em; }
-        .mode-title { display: inline-block; background: #e67e22; color: white; padding: 2px 10px; border-radius: 3px; margin-bottom: 5px; font-size: 0.9em; }
+        /* 非表示用クラス */
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>モンハンサンブレイクポイントランキング！</h1>
-
-    <div class="tabs">
-        <button onclick="filter('1h')" id="btn-1h">1時間部門</button>
-        <button onclick="filter('2h')" id="btn-2h">2時間部門</button>
-        <button onclick="filter('3h')" id="btn-3h">3時間部門</button>
+    <div class="header-area">
+        <h1>モンハンサンブレイクポイントランキング！</h1>
+        <span class="sub-title">早矢りんと杯</span>
     </div>
 
-    <h2 id="current-dept" style="text-align:center; color:#e67e22;">1時間部門</h2>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="changeDept('1h')" id="btn-1h">1時間部門</button>
+        <button class="tab-btn" onclick="changeDept('2h')" id="btn-2h">2時間部門</button>
+        <button class="tab-btn" onclick="changeDept('3h')" id="btn-3h">3時間部門</button>
+    </div>
 
-    <div id="ranking-container">
+    <div class="filter-area">
+        <p style="margin-top:0;">表示する形式を選択してください：</p>
+        <label><input type="checkbox" checked onchange="toggleFilter()" value="solo"> ソロ（1人）</label>
+        <label><input type="checkbox" checked onchange="toggleFilter()" value="tag"> タッグ（2人）</label>
+        <label><input type="checkbox" checked onchange="toggleFilter()" value="trio"> トリオ（3人）</label>
+        <label><input type="checkbox" checked onchange="toggleFilter()" value="full"> フルパ（4人）</label>
+    </div>
+
+    <div id="current-dept">1時間部門</div>
+
+    <div id="ranking-render-area">
         </div>
 </div>
 
 <script>
-// ★ここを書き換えてデータを更新します
-const rankingData = {
-    '1h': {
-        name: '1時間部門',
-        tables: [
-            { title: 'アプデ武器防具なし', rows: [
-                { type: 'ソロ', players: ['名前A', '名前B', '---', '---', '---', '---', '---', '---', '---', '---'], pts: [1500, 1200, 0, 0, 0, 0, 0, 0, 0, 0] },
-                { type: 'タッグ', players: ['チームα', '---', '---', '---', '---', '---', '---', '---', '---', '---'], pts: [2500, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-                { type: 'トリオ', players: Array(10).fill('---'), pts: Array(10).fill(0) },
-                { type: 'フルパ', players: Array(10).fill('---'), pts: Array(10).fill(0) }
-            ]},
-            { title: 'アプデ武器防具あり', rows: [
-                { type: 'ソロ', players: Array(10).fill('---'), pts: Array(10).fill(0) },
-                { type: 'タッグ', players: Array(10).fill('---'), pts: Array(10).fill(0) },
-                { type: 'トリオ', players: Array(10).fill('---'), pts: Array(10).fill(0) },
-                { type: 'フルパ', players: Array(10).fill('---'), pts: Array(10).fill(0) }
-            ]}
-        ]
+// ★データ設定エリア（ここを自由に書き換えてください）
+const config = {
+    depts: {
+        '1h': '1時間部門',
+        '2h': '2時間部門',
+        '3h': '3時間部門'
     },
-    '2h': { name: '2時間部門', tables: [] }, // 1hと同様の構造をコピーして追加可能
-    '3h': { name: '3時間部門', tables: [] }
+    modes: [
+        { id: 'solo', label: 'ソロ（1人）' },
+        { id: 'tag',  label: 'タッグ（2人）' },
+        { id: 'trio', label: 'トリオ（3人）' },
+        { id: 'full', label: 'フルパ（4人）' }
+    ]
 };
 
-function filter(dept) {
-    document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-' + dept).classList.add('active');
-    document.getElementById('current-dept').textContent = rankingData[dept].name;
+// サンプルデータ
+const rankingData = {
+    '1h': {
+        'アプデ武器防具なし': {
+            'solo': { players: ['ハンターA', 'ハンターB'], pts: [1500, 1400] },
+            'tag':  { players: ['チームα'], pts: [2800] },
+            'trio': { players: [], pts: [] },
+            'full': { players: [], pts: [] }
+        },
+        'アプデ武器防具あり': {
+            'solo': { players: [], pts: [] },
+            'tag':  { players: [], pts: [] },
+            'trio': { players: [], pts: [] },
+            'full': { players: [], pts: [] }
+        }
+    }
+    // 2h, 3hも同様に作成可能
+};
 
-    const container = document.getElementById('ranking-container');
-    container.innerHTML = ''; 
+let currentActiveDept = '1h';
 
-    const targetTables = rankingData[dept].tables.length > 0 ? rankingData[dept].tables : rankingData['1h'].tables;
-
-    targetTables.forEach(tableData => {
-        let html = `<div class="section-title">${tableData.title}</div>`;
-        
-        tableData.rows.forEach(row => {
-            html += `<div class="mode-title">${row.type}</div>`;
-            html += `<div class="table-wrapper"><table><thead><tr><th width="10%">順位</th><th width="60%">プレイヤー/チーム名</th><th width="30%">ポイント</th></tr></thead><tbody>`;
-            
-            for(let i=0; i<10; i++) {
-                let rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
-                html += `<tr class="${rankClass}"><td>${i+1}</td><td>${row.players[i]}</td><td>${row.pts[i].toLocaleString()} pt</td></tr>`;
-            }
-            html += `</tbody></table></div><br>`;
-        });
-        container.innerHTML += html;
-    });
+function changeDept(id) {
+    currentActiveDept = id;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-' + id).classList.add('active');
+    document.getElementById('current-dept').textContent = config.depts[id];
+    render();
 }
 
-// 初期実行
-filter('1h');
+function toggleFilter() {
+    render();
+}
+
+function render() {
+    const area = document.getElementById('ranking-render-area');
+    area.innerHTML = '';
+    
+    // チェックが入っているIDを取得
+    const activeFilters = Array.from(document.querySelectorAll('.filter-area input:checked')).map(i => i.value);
+    
+    const targetData = rankingData[currentActiveDept] || rankingData['1h']; // データがない時は1hを参考に表示
+
+    for (const [sectionTitle, modes] of Object.entries(targetData)) {
+        let sectionHtml = `<div class="section-title">【${sectionTitle}】</div>`;
+        let hasVisibleContent = false;
+
+        config.modes.forEach(mode => {
+            if (activeFilters.includes(mode.id)) {
+                hasVisibleContent = true;
+                sectionHtml += `<span class="mode-title">${mode.label}</span>`;
+                sectionHtml += `<div class="table-wrapper"><table>
+                    <thead><tr><th width="15%">順位</th><th>プレイヤー/チーム名</th><th width="25%">ポイント</th></tr></thead>
+                    <tbody>`;
+                
+                const mData = modes[mode.id] || { players: [], pts: [] };
+                for (let i = 0; i < 10; i++) {
+                    const rank = i + 1;
+                    const pName = mData.players[i] || '---';
+                    const pPoint = mData.pts[i] ? mData.pts[i].toLocaleString() + ' pt' : '---';
+                    const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-3' : rank === 3 ? 'rank-3' : '';
+                    
+                    sectionHtml += `<tr class="${rankClass}">
+                        <td class="rank-num">${rank}位</td>
+                        <td>${pName}</td>
+                        <td>${pPoint}</td>
+                    </tr>`;
+                }
+                sectionHtml += `</tbody></table></div>`;
+            }
+        });
+
+        if (hasVisibleContent) {
+            area.innerHTML += sectionHtml;
+        }
+    }
+}
+
+// 起動時に実行
+render();
 </script>
 
 </body>
