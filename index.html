@@ -9,7 +9,9 @@
         .container { max-width: 1000px; margin: 20px auto; background: #2c3e50; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
         .header-area { text-align: center; margin-bottom: 30px; }
         h1 { color: #f1c40f; font-size: 2em; margin: 0; text-shadow: 2px 2px 4px #000; }
-        .sub-title { color: #e67e22; font-size: 1.8em; font-weight: bold; display: block; margin-top: 10px; }
+        /* 【修正】一行にまとめ、サイズを微調整 */
+        .sub-title { color: #e67e22; font-size: 2em; font-weight: bold; display: block; margin-top: 10px; white-space: nowrap; }
+        
         .category-tabs { display: flex; justify-content: center; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid #444; padding-bottom: 15px; }
         .cat-btn { padding: 10px 15px; cursor: pointer; border: none; background: #34495e; color: #bdc3c7; font-weight: bold; border-radius: 5px; flex: 1; max-width: 200px; transition: 0.3s; }
         .cat-btn.active { background: #e74c3c; color: white; }
@@ -29,7 +31,7 @@
         th { background: #34495e; color: white; }
         .rank-1 { background: #fff4d1; font-weight: bold; } 
         .rank-2 { background: #f0f0f0; } 
-        .rank-3 { background: #ffebd1; } /* 3位の色を追加 */
+        .rank-3 { background: #ffebd1; }
     </style>
 </head>
 <body>
@@ -37,7 +39,7 @@
 <div class="container">
     <div class="header-area">
         <h1>モンハンサンブレイクポイントランキング！</h1>
-        <span class="sub-title">早矢りんと<br>杯</span>
+        <span class="sub-title">早矢りんと杯</span>
     </div>
 
     <div class="category-tabs">
@@ -73,7 +75,6 @@ const config = {
     modes: [{id:'solo', label:'ソロ（1人）'}, {id:'tag', label:'タッグ（2人）'}, {id:'trio', label:'トリオ（3人）'}, {id:'full', label:'フルパ（4人）'}]
 };
 
-// 【改良】何人でも自由にデータを入れられるように修正
 const setRankData = (playerList, pointList) => {
     const players = Array(10).fill('---');
     const pts = Array(10).fill(0);
@@ -85,7 +86,6 @@ const setRankData = (playerList, pointList) => {
 const rankingData = {
     'general': {
         '1h': { 'アプデなし': { 
-            // 3人以上のデータを正しく反映
             'solo': setRankData(['チャトラ', '早矢りんと', 'フェンリル'], [920, 575, 475]),
             'tag':  setRankData(['チームα', 'チームβ'], [1200, 1100]),
             'trio': setRankData(['トリオA', 'トリオB'], [1500, 1400]),
@@ -147,9 +147,7 @@ function render() {
             if(activeFilters.includes(m.id)) {
                 hasVisibleTable = true;
                 sectionHtml += `<span class="mode-title">${m.label}</span><div class="table-wrapper"><table><thead><tr><th width="15%">順位</th><th>プレイヤー名</th><th width="25%">ポイント</th></tr></thead><tbody>`;
-                
                 const d = (dataSet[s.key] && dataSet[s.key][m.id]) ? dataSet[s.key][m.id] : setRankData([], []);
-                
                 for(let i=0; i<10; i++){
                     const rank = i+1;
                     const name = d.players[i] || '---';
