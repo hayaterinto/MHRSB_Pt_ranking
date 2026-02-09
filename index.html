@@ -1,11 +1,121 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>マイサイト</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>モンハンサンブレイクポイントランキング</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; background: #2c3e50; color: #ecf0f1; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: #34495e; padding: 20px; border-radius: 10px; }
+        h1 { text-align: center; color: #f1c40f; border-bottom: 2px solid #f1c40f; padding-bottom: 10px; }
+        
+        /* 切り替えボタンのスタイル */
+        .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; justify-content: center; }
+        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 5px; background: #7f8c8d; color: white; font-weight: bold; }
+        button.active { background: #e67e22; }
+        
+        /* ランキングテーブル */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; color: #333; border-radius: 5px; overflow: hidden; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: center; }
+        th { background: #e74c3c; color: white; }
+        tr:nth-child(even) { background: #f2f2f2; }
+        
+        .section-title { background: #bdc3c7; color: #2c3e50; padding: 5px; margin-top: 20px; font-weight: bold; border-radius: 3px; }
+    </style>
 </head>
 <body>
-    <h1>サイトへようこそ！</h1>
-    <p>ネットの知り合いと一緒に作っているサイトです。</p>
+
+<div class="container">
+    <h1>モンハンサンブレイクポイントランキング！</h1>
+
+    <div class="tabs">
+        <button onclick="filter('1h')" id="btn-1h">1時間部門</button>
+        <button onclick="filter('2h')" id="btn-2h">2時間部門</button>
+        <button onclick="filter('3h')" id="btn-3h">3時間部門</button>
+    </div>
+
+    <div id="ranking-content">
+        <h2 id="current-dept">1時間部門</h2>
+
+        <div class="section-title">【アプデ武器防具なし】</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>形式</th>
+                    <th>1位</th>
+                    <th>2位</th>
+                    <th>3位</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>ソロ</td><td id="solo-no">---</td><td>---</td><td>---</td></tr>
+                <tr><td>タッグ</td><td id="tag-no">---</td><td>---</td><td>---</td></tr>
+                <tr><td>トリオ</td><td id="trio-no">---</td><td>---</td><td>---</td></tr>
+                <tr><td>フルパ</td><td id="full-no">---</td><td>---</td><td>---</td></tr>
+            </tbody>
+        </table>
+
+        <div class="section-title">【アプデ武器防具あり】</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>形式</th>
+                    <th>1位</th>
+                    <th>2位</th>
+                    <th>3位</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>ソロ</td><td id="solo-yes">---</td><td>---</td><td>---</td></tr>
+                <tr><td>タッグ</td><td id="tag-yes">---</td><td>---</td><td>---</td></tr>
+                <tr><td>トリオ</td><td id="trio-yes">---</td><td>---</td><td>---</td></tr>
+                <tr><td>フルパ</td><td id="full-yes">---</td><td>---</td><td>---</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // データ管理（ここにランキングの名前などを書き込みます）
+    const data = {
+        '1h': {
+            name: '1時間部門',
+            solo_no: 'ハンターA', tag_no: 'チームα', trio_no: '---', full_no: '---',
+            solo_yes: 'ハンターB', tag_yes: '---', trio_yes: '---', full_yes: '---'
+        },
+        '2h': {
+            name: '2時間部門',
+            solo_no: '---', tag_no: '---', trio_no: '---', full_no: '---',
+            solo_yes: '---', tag_yes: '---', trio_yes: '---', full_yes: '---'
+        },
+        '3h': {
+            name: '3時間部門',
+            solo_no: '---', tag_no: '---', trio_no: '---', full_no: '---',
+            solo_yes: '---', tag_yes: '---', trio_yes: '---', full_yes: '---'
+        }
+    };
+
+    function filter(dept) {
+        // ボタンの色変更
+        document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-' + dept).classList.add('active');
+
+        // 表示の書き換え
+        document.getElementById('current-dept').textContent = data[dept].name;
+        document.getElementById('solo-no').textContent = data[dept].solo_no;
+        document.getElementById('tag-no').textContent = data[dept].tag_no;
+        document.getElementById('trio-no').textContent = data[dept].trio_no;
+        document.getElementById('full-no').textContent = data[dept].full_no;
+        
+        document.getElementById('solo-yes').textContent = data[dept].solo_yes;
+        document.getElementById('tag-yes').textContent = data[dept].tag_yes;
+        document.getElementById('trio-yes').textContent = data[dept].trio_yes;
+        document.getElementById('full-yes').textContent = data[dept].full_yes;
+    }
+
+    // 初期表示
+    filter('1h');
+</script>
+
 </body>
 </html>
