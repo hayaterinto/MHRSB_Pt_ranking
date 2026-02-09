@@ -29,7 +29,7 @@
         th { background: #34495e; color: white; }
         .rank-1 { background: #fff4d1; font-weight: bold; } 
         .rank-2 { background: #f0f0f0; } 
-        .rank-3 { background: #ffebd1; }
+        .rank-3 { background: #ffebd1; } /* 3位の色を追加 */
     </style>
 </head>
 <body>
@@ -73,53 +73,36 @@ const config = {
     modes: [{id:'solo', label:'ソロ（1人）'}, {id:'tag', label:'タッグ（2人）'}, {id:'trio', label:'トリオ（3人）'}, {id:'full', label:'フルパ（4人）'}]
 };
 
-// 共通の空データ作成関数
-const createEmptyData = (p1='---', v1=0, p2='---', v2=0) => ({
-    players: [p1, p2, '---', '---', '---', '---', '---', '---', '---', '---'],
-    pts: [v1, v2, 0, 0, 0, 0, 0, 0, 0, 0]
-});
+// 【改良】何人でも自由にデータを入れられるように修正
+const setRankData = (playerList, pointList) => {
+    const players = Array(10).fill('---');
+    const pts = Array(10).fill(0);
+    playerList.forEach((name, i) => { if(i < 10) players[i] = name; });
+    pointList.forEach((pt, i) => { if(i < 10) pts[i] = pt; });
+    return { players, pts };
+};
 
-// ★ランキングデータ本体
 const rankingData = {
     'general': {
         '1h': { 'アプデなし': { 
-            'solo': createEmptyData('チャトラ', 920, '早矢りんと', 575,'フェンリル', 475),
-            'tag':  createEmptyData('チームα', 1200, 'チームβ', 1100),
-            'trio': createEmptyData('トリオA', 1500, 'トリオB', 1400),
-            'full': createEmptyData('フルパA', 2000, 'フルパB', 1800)
+            // 3人以上のデータを正しく反映
+            'solo': setRankData(['チャトラ', '早矢りんと', 'フェンリル'], [920, 575, 475]),
+            'tag':  setRankData(['チームα', 'チームβ'], [1200, 1100]),
+            'trio': setRankData(['トリオA', 'トリオB'], [1500, 1400]),
+            'full': setRankData(['フルパA', 'フルパB'], [2000, 1800])
         } },
         '2h': { 'アプデなし': { 
-            'solo': createEmptyData('早矢りんと', 1000, '一般参加B', 800),
-            'tag':  createEmptyData('チームγ', 2200, 'チームδ', 2000),
-            'trio': createEmptyData('トリオC', 2500, 'トリオD', 2300),
-            'full': createEmptyData('フルパC', 3500, 'フルパD', 3200)
+            'solo': setRankData(['早矢りんと', '一般参加B'], [1000, 800])
         } },
         '3h': { 'アプデなし': { 
-            'solo': createEmptyData('早矢りんと', 1500, '一般参加C', 1200),
-            'tag':  createEmptyData('チームε', 3200, 'チームζ', 3000),
-            'trio': createEmptyData('トリオE', 3800, 'トリオF', 3500),
-            'full': createEmptyData('フルパE', 4500, 'フルパF', 4200)
+            'solo': setRankData(['早矢りんと', '一般参加C'], [1500, 1200])
         } }
     },
     'streamer_only': {
-        '1h': { 'アプデなし': { 
-            'solo': createEmptyData('配信者A', 800, '配信者B', 750),
-            'tag':  createEmptyData('配信コンビA', 1500, '配信コンビB', 1400),
-            'trio': createEmptyData('配信トリオA', 2000, '配信トリオB', 1800),
-            'full': createEmptyData('配信フルパA', 3000, '配信フルパB', 2800)
-        } },
-        '2h': { 'アプデなし': { 'solo': createEmptyData('配信者C', 1600, '配信者D', 1500), 'tag': createEmptyData('---',0,'---',0), 'trio': createEmptyData('---',0,'---',0), 'full': createEmptyData('---',0,'---',0) } },
-        '3h': { 'アプデなし': { 'solo': createEmptyData('配信者E', 2500, '配信者F', 2300), 'tag': createEmptyData('---',0,'---',0), 'trio': createEmptyData('---',0,'---',0), 'full': createEmptyData('---',0,'---',0) } }
+        '1h': { 'アプデなし': { 'solo': setRankData(['配信者A', '配信者B'], [800, 750]) } }
     },
     'streamer_collab': {
-        '1h': { 'アプデなし': { 
-            'solo': createEmptyData('協力ソロA', 700, '協力ソロB', 650),
-            'tag':  createEmptyData('協力タッグA', 1800, '協力タッグB', 1600),
-            'trio': createEmptyData('協力トリオA', 2500, '協力トリオB', 2200),
-            'full': createEmptyData('協力フルパA', 3500, '協力フルパB', 3100)
-        } },
-        '2h': { 'アプデなし': { 'solo': createEmptyData('協力者X', 1400, '協力者Y', 1300), 'tag': createEmptyData('---',0,'---',0), 'trio': createEmptyData('---',0,'---',0), 'full': createEmptyData('---',0,'---',0) } },
-        '3h': { 'アプデなし': { 'solo': createEmptyData('協力者Z', 2100, '協力者W', 2000), 'tag': createEmptyData('---',0,'---',0), 'trio': createEmptyData('---',0,'---',0), 'full': createEmptyData('---',0,'---',0) } }
+        '1h': { 'アプデなし': { 'solo': setRankData(['協力ソロA', '協力ソロB'], [700, 650]) } }
     }
 };
 
@@ -164,7 +147,9 @@ function render() {
             if(activeFilters.includes(m.id)) {
                 hasVisibleTable = true;
                 sectionHtml += `<span class="mode-title">${m.label}</span><div class="table-wrapper"><table><thead><tr><th width="15%">順位</th><th>プレイヤー名</th><th width="25%">ポイント</th></tr></thead><tbody>`;
-                const d = (dataSet[s.key] && dataSet[s.key][m.id]) ? dataSet[s.key][m.id] : createEmptyData();
+                
+                const d = (dataSet[s.key] && dataSet[s.key][m.id]) ? dataSet[s.key][m.id] : setRankData([], []);
+                
                 for(let i=0; i<10; i++){
                     const rank = i+1;
                     const name = d.players[i] || '---';
