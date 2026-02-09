@@ -11,23 +11,25 @@
         h1 { color: #f1c40f; font-size: 2em; margin: 0; text-shadow: 2px 2px 4px #000; }
         .sub-title { color: #e67e22; font-size: 1.8em; font-weight: bold; display: block; margin-top: 10px; }
         .category-tabs { display: flex; justify-content: center; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid #444; padding-bottom: 15px; }
-        .cat-btn { padding: 10px 15px; cursor: pointer; border: none; background: #34495e; color: #bdc3c7; font-weight: bold; border-radius: 5px; flex: 1; max-width: 200px; }
+        .cat-btn { padding: 10px 15px; cursor: pointer; border: none; background: #34495e; color: #bdc3c7; font-weight: bold; border-radius: 5px; flex: 1; max-width: 200px; transition: 0.3s; }
         .cat-btn.active { background: #e74c3c; color: white; }
         .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
-        .tab-btn { padding: 10px 20px; cursor: pointer; border: 2px solid #e67e22; border-radius: 5px; background: transparent; color: #e67e22; font-weight: bold; }
+        .tab-btn { padding: 10px 20px; cursor: pointer; border: 2px solid #e67e22; border-radius: 5px; background: transparent; color: #e67e22; font-weight: bold; transition: 0.3s; }
         .tab-btn.active { background: #e67e22; color: white; }
         .filter-area { background: #34495e; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
-        .filter-area label { margin: 0 10px; font-weight: bold; cursor: pointer; }
+        .filter-area label { margin: 0 10px; font-weight: bold; cursor: pointer; white-space: nowrap; }
         #display-title { text-align: center; margin: 30px 0; }
         .current-cat-name { display: block; font-size: 1.5em; color: #bdc3c7; }
         .current-dept-name { display: block; font-size: 2.5em; color: #f39c12; font-weight: bold; border-bottom: 3px double #f39c12; }
         .section-title { background: #c0392b; color: white; padding: 10px; margin-top: 40px; text-align: center; font-size: 1.4em; border-radius: 5px; }
-        .mode-title { text-align: center; font-size: 2em; font-weight: bold; margin: 30px 0 10px 0; display: block; }
+        .mode-title { text-align: center; font-size: 2em; font-weight: bold; margin: 30px 0 10px 0; display: block; color: #fff; }
         .table-wrapper { overflow-x: auto; margin-bottom: 30px; }
-        table { width: 100%; border-collapse: collapse; background: #fff; color: #333; min-width: 600px; }
+        table { width: 100%; border-collapse: collapse; background: #fff; color: #333; min-width: 600px; border-radius: 5px; overflow: hidden; }
         th, td { padding: 12px; border: 1px solid #bdc3c7; text-align: center; }
         th { background: #34495e; color: white; }
-        .rank-1 { background: #fff4d1; } .rank-2 { background: #f0f0f0; } .rank-3 { background: #ffebd1; }
+        .rank-1 { background: #fff4d1; font-weight: bold; } 
+        .rank-2 { background: #f0f0f0; } 
+        .rank-3 { background: #ffebd1; }
     </style>
 </head>
 <body>
@@ -71,18 +73,53 @@ const config = {
     modes: [{id:'solo', label:'ソロ（1人）'}, {id:'tag', label:'タッグ（2人）'}, {id:'trio', label:'トリオ（3人）'}, {id:'full', label:'フルパ（4人）'}]
 };
 
-// ★ここがランキングのデータです
+// 共通の空データ作成関数
+const createEmptyData = (p1='---', v1=0, p2='---', v2=0) => ({
+    players: [p1, p2, '---', '---', '---', '---', '---', '---', '---', '---'],
+    pts: [v1, v2, 0, 0, 0, 0, 0, 0, 0, 0]
+});
+
+// ★ランキングデータ本体
 const rankingData = {
     'general': {
-        '1h': { 'アプデなし': { 'solo': { players:['早矢りんと'], pts:[575] } } },
-        '2h': { 'アプデなし': { 'solo': { players:['早矢りんと'], pts:[1000] } } },
-        '3h': { 'アプデなし': { 'solo': { players:['早矢りんと'], pts:[1500] } } }
+        '1h': { 'アプデなし': { 
+            'solo': createEmptyData('早矢りんと', 575, '一般参加A', 400),
+            'tag':  createEmptyData('チームα', 1200, 'チームβ', 1100),
+            'trio': createEmptyData('トリオA', 1500, 'トリオB', 1400),
+            'full': createEmptyData('フルパA', 2000, 'フルパB', 1800)
+        } },
+        '2h': { 'アプデなし': { 
+            'solo': createEmptyData('早矢りんと', 1000, '一般参加B', 800),
+            'tag':  createEmptyData('チームγ', 2200, 'チームδ', 2000),
+            'trio': createEmptyData('トリオC', 2500, 'トリオD', 2300),
+            'full': createEmptyData('フルパC', 3500, 'フルパD', 3200)
+        } },
+        '3h': { 'アプデなし': { 
+            'solo': createEmptyData('早矢りんと', 1500, '一般参加C', 1200),
+            'tag':  createEmptyData('チームε', 3200, 'チームζ', 3000),
+            'trio': createEmptyData('トリオE', 3800, 'トリオF', 3500),
+            'full': createEmptyData('フルパE', 4500, 'フルパF', 4200)
+        } }
     },
     'streamer_only': {
-        '1h': { 'アプデなし': { 'solo': { players:['配信者サンプル'], pts:[999] } } }
+        '1h': { 'アプデなし': { 
+            'solo': createEmptyData('配信者A', 800, '配信者B', 750),
+            'tag':  createEmptyData('配信コンビA', 1500, '配信コンビB', 1400),
+            'trio': createEmptyData('配信トリオA', 2000, '配信トリオB', 1800),
+            'full': createEmptyData('配信フルパA', 3000, '配信フルパB', 2800)
+        } },
+        '2h': { 'アプデなし': { 'solo': createEmptyData('配信者C', 1600, '配信者D', 1500), 'tag': createEmptyData('---',0,'---',0), 'trio': createEmptyData('---',0,'---',0), 'full': createEmptyData('---',0,'---',0) } },
+        '3h': { 'アプデなし': { 'solo': createEmptyData('配信者E', 2500, '配信者F', 2300), 'tag': createEmptyData('---',0,'---',0), 'trio': createEmptyData('---',0,'---',0), 'full': createEmptyData('---',0,'---',0) } }
     },
     'streamer_collab': {
-        '1h': { 'アプデなし': { 'tag': { players:['配信協力サンプル'], pts:[888] } } }
+        '1h': { 'アプデなし': { 
+            'solo': createEmptyData('協力ソロA', 700, '協力ソロB', 650),
+            'tag':  createEmptyData('協力タッグA', 1800, '協力タッグB', 1600),
+            'trio': createEmptyData('協力トリオA', 2500, '協力トリオB', 2200),
+            'full': createEmptyData('協力フルパA', 3500, '協力フルパB', 3100)
+        } },
+        '2h': { 'アプデなし': { 'solo': createEmptyData('協力者X', 1400, '協力者Y', 1300), 'tag': createEmptyData('---',0,'---',0), 'trio': createEmptyData('---',0,'---',0), 'full': createEmptyData('---',0,'---',0) } },
+        '3h': { 'アプデなし': { 'solo': createEmptyData('協力者Z', 2100, '協力者W', 2000), 'tag': createEmptyData('---',0,'---',0), 'trio': createEmptyData('---',0,'---',0), 'full': createEmptyData('---',0,'---',0) } }
     }
 };
 
@@ -110,8 +147,6 @@ function changeDept(id) {
 function render() {
     const area = document.getElementById('ranking-area');
     area.innerHTML = '';
-    
-    // チェックの状態を取得
     const activeFilters = [];
     if(document.getElementById('f-solo').checked) activeFilters.push('solo');
     if(document.getElementById('f-tag').checked) activeFilters.push('tag');
@@ -119,12 +154,7 @@ function render() {
     if(document.getElementById('f-full').checked) activeFilters.push('full');
     
     const dataSet = (rankingData[currentCat] && rankingData[currentCat][currentDept]) ? rankingData[currentCat][currentDept] : {};
-
-    // セクションタイトルをデータと一致させました
-    const sections = [
-        { key: 'アプデなし', display: 'アプデ武器防具なし' },
-        { key: 'アプデあり', display: 'アプデ武器防具あり' }
-    ];
+    const sections = [{ key: 'アプデなし', display: 'アプデ武器防具なし' }, { key: 'アプデあり', display: 'アプデ武器防具あり' }];
 
     sections.forEach(s => {
         let sectionHtml = `<div class="section-title">【${s.display}】</div>`;
@@ -134,10 +164,7 @@ function render() {
             if(activeFilters.includes(m.id)) {
                 hasVisibleTable = true;
                 sectionHtml += `<span class="mode-title">${m.label}</span><div class="table-wrapper"><table><thead><tr><th width="15%">順位</th><th>プレイヤー名</th><th width="25%">ポイント</th></tr></thead><tbody>`;
-                
-                // データの取得
-                const d = (dataSet[s.key] && dataSet[s.key][m.id]) ? dataSet[s.key][m.id] : {players:[], pts:[]};
-                
+                const d = (dataSet[s.key] && dataSet[s.key][m.id]) ? dataSet[s.key][m.id] : createEmptyData();
                 for(let i=0; i<10; i++){
                     const rank = i+1;
                     const name = d.players[i] || '---';
@@ -151,8 +178,6 @@ function render() {
         if(hasVisibleTable) area.innerHTML += sectionHtml;
     });
 }
-
-// ページ読み込み時に実行
 window.onload = render;
 </script>
 </body>
