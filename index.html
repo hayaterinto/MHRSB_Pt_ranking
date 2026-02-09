@@ -5,45 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>モンハンサンブレイクポイントランキング！</title>
     <style>
-        body { font-family: 'Helvetica Neue', Arial, "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif; line-height: 1.6; background: #121212; color: #ecf0f1; padding: 10px; margin: 0; }
-        .container { max-width: 1000px; margin: 20px auto; background: #2c3e50; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 1px solid #34495e; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #121212; color: #ecf0f1; padding: 10px; margin: 0; }
+        .container { max-width: 1000px; margin: 20px auto; background: #2c3e50; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
         
-        /* タイトルエリア */
+        /* ヘッダー */
         .header-area { text-align: center; margin-bottom: 30px; }
-        h1 { color: #f1c40f; font-size: 2.2em; margin-bottom: 5px; text-shadow: 2px 2px 4px #000; letter-spacing: 2px; }
-        .sub-title { color: #e67e22; font-size: 1.8em; font-weight: bold; display: block; margin-top: 10px; line-height: 1.2; }
+        h1 { color: #f1c40f; font-size: 2em; margin: 0; text-shadow: 2px 2px 4px #000; }
+        .sub-title { color: #e67e22; font-size: 1.8em; font-weight: bold; display: block; margin-top: 10px; }
         
-        /* 部門切り替えボタン */
-        .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; justify-content: center; }
-        .tab-btn { padding: 12px 20px; cursor: pointer; border: 2px solid #e67e22; border-radius: 5px; background: transparent; color: #e67e22; font-weight: bold; font-size: 1em; transition: 0.3s; }
-        .tab-btn.active { background: #e67e22; color: white; box-shadow: 0 0 15px rgba(230, 126, 34, 0.5); }
-        .tab-btn:hover { background: rgba(230, 126, 34, 0.2); }
+        /* 大カテゴリータブ */
+        .category-tabs { display: flex; justify-content: center; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid #444; padding-bottom: 15px; }
+        .cat-btn { padding: 10px 15px; cursor: pointer; border: none; background: #34495e; color: #bdc3c7; font-weight: bold; border-radius: 5px; flex: 1; max-width: 200px; }
+        .cat-btn.active { background: #e74c3c; color: white; }
 
-        /* 絞り込みチェックボックス */
-        .filter-area { background: #34495e; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 30px; border: 1px solid #444; }
-        .filter-area label { margin: 5px 15px; font-weight: bold; font-size: 1.1em; cursor: pointer; display: inline-block; }
-        .filter-area input { transform: scale(1.5); margin-right: 8px; vertical-align: middle; }
+        /* 時間部門タブ */
+        .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
+        .tab-btn { padding: 10px 20px; cursor: pointer; border: 2px solid #e67e22; border-radius: 5px; background: transparent; color: #e67e22; font-weight: bold; }
+        .tab-btn.active { background: #e67e22; color: white; }
 
-        /* 現在の部門表示 */
-        #current-dept { text-align: center; color: #f39c12; font-size: 2.2em; margin: 30px 0; border-bottom: 3px double #f39c12; display: block; padding-bottom: 10px; font-weight: bold; }
+        /* チェックボックス */
+        .filter-area { background: #34495e; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
+        .filter-area label { margin: 0 10px; font-weight: bold; cursor: pointer; }
 
-        /* セクション・形式タイトル */
-        .section-title { background: #c0392b; color: white; padding: 10px; margin-top: 50px; text-align: center; font-size: 1.4em; font-weight: bold; border-radius: 5px; box-shadow: 0 4px 0 #8e1e14; }
-        .mode-title { text-align: center; font-size: 1.8em; font-weight: bold; color: #fff; margin: 40px 0 15px 0; display: block; text-shadow: 1px 1px 5px rgba(0,0,0,0.5); }
-        
-        /* テーブルスタイル */
-        .table-wrapper { overflow-x: auto; margin-bottom: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        table { width: 100%; border-collapse: collapse; background: #fff; color: #333; min-width: 600px; border-radius: 8px; overflow: hidden; }
+        /* タイトル表示 */
+        #display-title { text-align: center; margin: 30px 0; }
+        .current-cat-name { display: block; font-size: 1.5em; color: #bdc3c7; }
+        .current-dept-name { display: block; font-size: 2.5em; color: #f39c12; font-weight: bold; border-bottom: 3px double #f39c12; }
+
+        /* テーブル */
+        .section-title { background: #c0392b; color: white; padding: 10px; margin-top: 40px; text-align: center; font-size: 1.4em; border-radius: 5px; }
+        .mode-title { text-align: center; font-size: 2em; font-weight: bold; margin: 30px 0 10px 0; display: block; }
+        .table-wrapper { overflow-x: auto; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; background: #fff; color: #333; min-width: 600px; }
         th, td { padding: 12px; border: 1px solid #bdc3c7; text-align: center; }
-        th { background: #34495e; color: white; font-size: 1.1em; }
-        
-        /* 順位の装飾 */
-        .rank-1 { background: #fff4d1; font-weight: bold; }
-        .rank-2 { background: #f0f0f0; }
-        .rank-3 { background: #ffebd1; }
-        .rank-num { font-size: 1.2em; font-weight: bold; color: #2c3e50; }
-
-        footer { text-align: center; margin-top: 50px; color: #7f8c8d; font-size: 0.8em; }
+        th { background: #34495e; color: white; }
+        .rank-1 { background: #fff4d1; } .rank-2 { background: #f0f0f0; } .rank-3 { background: #ffebd1; }
     </style>
 </head>
 <body>
@@ -54,133 +50,111 @@
         <span class="sub-title">早矢りんと<br>杯</span>
     </div>
 
+    <div class="category-tabs">
+        <button class="cat-btn active" onclick="changeCategory('general')">一般部門</button>
+        <button class="cat-btn" onclick="changeCategory('streamer_only')">配信者限定</button>
+        <button class="cat-btn" onclick="changeCategory('streamer_collab')">配信者枠協力</button>
+    </div>
+
     <div class="tabs">
         <button class="tab-btn active" onclick="changeDept('1h')" id="btn-1h">1時間部門</button>
         <button class="tab-btn" onclick="changeDept('2h')" id="btn-2h">2時間部門</button>
         <button class="tab-btn" onclick="changeDept('3h')" id="btn-3h">3時間部門</button>
-        <button class="tab-btn" onclick="changeDept('streamer')" id="btn-streamer" style="border-color:#9b59b6; color:#9b59b6;">配信者部門</button>
     </div>
 
     <div class="filter-area">
-        <p style="margin-top:0; color:#bdc3c7;">表示する形式を選択：</p>
-        <label><input type="checkbox" checked onchange="toggleFilter()" value="solo"> ソロ（1人）</label>
-        <label><input type="checkbox" checked onchange="toggleFilter()" value="tag"> タッグ（2人）</label>
-        <label><input type="checkbox" checked onchange="toggleFilter()" value="trio"> トリオ（3人）</label>
-        <label><input type="checkbox" checked onchange="toggleFilter()" value="full"> フルパ（4人）</label>
+        <label><input type="checkbox" checked onchange="render()" value="solo"> ソロ（1人）</label>
+        <label><input type="checkbox" checked onchange="render()" value="tag"> タッグ（2人）</label>
+        <label><input type="checkbox" checked onchange="render()" value="trio"> トリオ（3人）</label>
+        <label><input type="checkbox" checked onchange="render()" value="full"> フルパ（4人）</label>
     </div>
 
-    <div id="current-dept">1時間部門</div>
+    <div id="display-title">
+        <span id="current-cat" class="current-cat-name">一般部門</span>
+        <span id="current-dept" class="current-dept-name">1時間部門</span>
+    </div>
 
-    <div id="ranking-render-area">
-        </div>
+    <div id="ranking-area"></div>
 </div>
 
-<footer>
-    &copy; 早矢りんと杯 Ranking System
-</footer>
-
 <script>
-// ★データ設定エリア
 const config = {
-    depts: {
-        '1h': '1時間部門',
-        '2h': '2時間部門',
-        '3h': '3時間部門',
-        'streamer': '配信者部門'
-    },
-    modes: [
-        { id: 'solo', label: 'ソロ（1人）' },
-        { id: 'tag',  label: 'タッグ（2人）' },
-        { id: 'trio', label: 'トリオ（3人）' },
-        { id: 'full', label: 'フルパ（4人）' }
-    ]
+    categories: { 'general': '一般部門', 'streamer_only': '配信者限定', 'streamer_collab': '配信者枠協力' },
+    modes: [{id:'solo', label:'ソロ（1人）'}, {id:'tag', label:'タッグ（2人）'}, {id:'trio', label:'トリオ（3人）'}, {id:'full', label:'フルパ（4人）'}]
 };
 
+// データ管理 (ここで各ページ・各時間のデータを設定)
 const rankingData = {
-    '1h': {
-        'アプデ武器防具なし': {
-            'solo': { players: ['早矢りんと'], pts: [575] },
-            'tag': { players: [], pts: [] }, 'trio': { players: [], pts: [] }, 'full': { players: [], pts: [] }
-        },
-        'アプデ武器防具あり': {
-            'solo': { players: [], pts: [] }, 'tag': { players: [], pts: [] }, 'trio': { players: [], pts: [] }, 'full': { players: [], pts: [] }
-        }
+    'general': {
+        '1h': { 'アプデなし': { 'solo': { players:['早矢りんと'], pts:[575] } } },
+        '2h': { 'アプデなし': { 'solo': { players:['早矢りんと'], pts:[1000] } } },
+        '3h': { 'アプデなし': { 'solo': { players:['早矢りんと'], pts:[1500] } } }
     },
-    '2h': {
-        'アプデ武器防具なし': {
-            'solo': { players: ['早矢りんと'], pts: [1000] },
-            'tag': { players: [], pts: [] }, 'trio': { players: [], pts: [] }, 'full': { players: [], pts: [] }
-        },
-        'アプデ武器防具あり': {
-            'solo': { players: [], pts: [] }, 'tag': { players: [], pts: [] }, 'trio': { players: [], pts: [] }, 'full': { players: [], pts: [] }
-        }
+    'streamer_only': {
+        '1h': { 'アプデなし': { 'solo': { players:['配信者X'], pts:[800] } } }
     },
-    '3h': {
-        'アプデ武器防具なし': {
-            'solo': { players: ['早矢りんと'], pts: [1500] },
-            'tag': { players: [], pts: [] }, 'trio': { players: [], pts: [] }, 'full': { players: [], pts: [] }
-        },
-        'アプデ武器防具あり': {
-            'solo': { players: [], pts: [] }, 'tag': { players: [], pts: [] }, 'trio': { players: [], pts: [] }, 'full': { players: [], pts: [] }
-        }
-    },
-    'streamer': {
-        'アプデ武器防具なし': {
-            'solo': { players: ['配信者A'], pts: [2000] },
-            'tag': { players: [], pts: [] }, 'trio': { players: [], pts: [] }, 'full': { players: [], pts: [] }
-        },
-        'アプデ武器防具あり': {
-            'solo': { players: [], pts: [] }, 'tag': { players: [], pts: [] }, 'trio': { players: [], pts: [] }, 'full': { players: [], pts: [] }
-        }
+    'streamer_collab': {
+        '1h': { 'アプデなし': { 'tag': { players:['配信者Y＆リスナー'], pts:[2000] } } }
     }
 };
 
-let currentActiveDept = '1h';
+let currentCat = 'general';
+let currentDept = '1h';
 
-function changeDept(id) {
-    currentActiveDept = id;
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-' + id).classList.add('active');
-    document.getElementById('current-dept').textContent = config.depts[id];
+function changeCategory(id) {
+    currentCat = id;
+    document.querySelectorAll('.cat-btn').forEach(b => {
+        b.classList.remove('active');
+        if(b.innerText === config.categories[id]) b.classList.add('active');
+    });
+    document.getElementById('current-cat').textContent = config.categories[id];
     render();
 }
 
-function toggleFilter() { render(); }
+function changeDept(id) {
+    currentDept = id;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-'+id).classList.add('active');
+    document.getElementById('current-dept').textContent = id.replace('h','時間部門');
+    render();
+}
 
 function render() {
-    const area = document.getElementById('ranking-render-area');
+    const area = document.getElementById('ranking-area');
     area.innerHTML = '';
     const activeFilters = Array.from(document.querySelectorAll('.filter-area input:checked')).map(i => i.value);
-    const targetData = rankingData[currentActiveDept];
+    
+    // 現在のカテゴリと時間に基づいたデータを取得
+    const dataSet = (rankingData[currentCat] && rankingData[currentCat][currentDept]) ? rankingData[currentCat][currentDept] : {};
 
-    if (!targetData) return;
-
-    for (const [sectionTitle, modes] of Object.entries(targetData)) {
-        let sectionHtml = `<div class="section-title">【${sectionTitle}】</div>`;
-        let hasVisibleContent = false;
-
-        config.modes.forEach(mode => {
-            if (activeFilters.includes(mode.id)) {
-                hasVisibleContent = true;
-                sectionHtml += `<span class="mode-title">${mode.label}</span>`;
-                sectionHtml += `<div class="table-wrapper"><table>
-                    <thead><tr><th width="15%">順位</th><th>プレイヤー/チーム名</th><th width="25%">ポイント</th></tr></thead>
-                    <tbody>`;
+    // セクション（アプデなし・あり）ごとにループ
+    const sections = ['アプデ武器防具なし', 'アプデ武器防具あり'];
+    sections.forEach(sTitle => {
+        let html = `<div class="section-title">【${sTitle}】</div>`;
+        let hasData = false;
+        
+        config.modes.forEach(m => {
+            if(activeFilters.includes(m.id)) {
+                hasData = true;
+                html += `<span class="mode-title">${m.label}</span><div class="table-wrapper"><table><thead><tr><th width="15%">順位</th><th>プレイヤー名</th><th width="25%">ポイント</th></tr></thead><tbody>`;
                 
-                const mData = modes[mode.id] || { players: [], pts: [] };
-                for (let i = 0; i < 10; i++) {
-                    const rank = i + 1;
-                    const pName = mData.players[i] || '---';
-                    const pPoint = mData.pts[i] ? mData.pts[i].toLocaleString() + ' pt' : '---';
-                    const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
-                    sectionHtml += `<tr class="${rankClass}"><td class="rank-num">${rank}位</td><td>${pName}</td><td>${pPoint}</td></tr>`;
+                // データの流し込み（sTitleのキーがデータにあるか確認）
+                const d = (dataSet[sTitle] && dataSet[sTitle][m.id]) ? dataSet[sTitle][m.id] : {players:[], pts:[]};
+                
+                for(let i=0; i<10; i++){
+                    const rank = i+1;
+                    const p = d.players[i] || '---';
+                    const pt = d.pts[i] ? d.pts[i].toLocaleString() + ' pt' : '---';
+                    const cls = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'';
+                    html += `<tr class="${cls}"><td>${rank}位</td><td>${p}</td><td>${pt}</td></tr>`;
                 }
-                sectionHtml += `</tbody></table></div>`;
+                html += `</tbody></table></div>`;
             }
         });
-        if (hasVisibleContent) area.innerHTML += sectionHtml;
-    }
+        if(hasData) area.innerHTML += html;
+    });
 }
+
 render();
 </script>
 </body>
