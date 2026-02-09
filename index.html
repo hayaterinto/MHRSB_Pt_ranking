@@ -5,22 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>モンハンサンブレイクポイントランキング</title>
     <style>
-        body { font-family: sans-serif; line-height: 1.6; background: #2c3e50; color: #ecf0f1; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background: #34495e; padding: 20px; border-radius: 10px; }
-        h1 { text-align: center; color: #f1c40f; border-bottom: 2px solid #f1c40f; padding-bottom: 10px; }
+        body { font-family: sans-serif; line-height: 1.6; background: #1a1a1a; color: #ecf0f1; padding: 10px; }
+        .container { max-width: 1000px; margin: auto; background: #2c3e50; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1 { text-align: center; color: #f1c40f; text-shadow: 1px 1px 2px #000; }
         
-        /* 切り替えボタンのスタイル */
-        .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; justify-content: center; }
-        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 5px; background: #7f8c8d; color: white; font-weight: bold; }
-        button.active { background: #e67e22; }
+        .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
+        button { padding: 12px 20px; cursor: pointer; border: none; border-radius: 5px; background: #95a5a6; color: white; font-weight: bold; transition: 0.3s; }
+        button.active { background: #e67e22; box-shadow: 0 0 10px #e67e22; }
         
-        /* ランキングテーブル */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; color: #333; border-radius: 5px; overflow: hidden; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: center; }
-        th { background: #e74c3c; color: white; }
-        tr:nth-child(even) { background: #f2f2f2; }
+        .table-wrapper { overflow-x: auto; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; background: #fff; color: #333; min-width: 600px; }
+        th, td { padding: 10px; border: 1px solid #bdc3c7; text-align: center; }
+        th { background: #c0392b; color: white; position: sticky; top: 0; }
         
-        .section-title { background: #bdc3c7; color: #2c3e50; padding: 5px; margin-top: 20px; font-weight: bold; border-radius: 3px; }
+        /* 1〜3位の色付け */
+        .rank-1 { background: #fff4d1; font-weight: bold; }
+        .rank-2 { background: #f0f0f0; }
+        .rank-3 { background: #ffebd1; }
+        
+        .section-title { background: #34495e; color: #f1c40f; padding: 8px; margin-top: 30px; border-left: 5px solid #e67e22; font-size: 1.2em; }
+        .mode-title { display: inline-block; background: #e67e22; color: white; padding: 2px 10px; border-radius: 3px; margin-bottom: 5px; font-size: 0.9em; }
     </style>
 </head>
 <body>
@@ -34,87 +38,65 @@
         <button onclick="filter('3h')" id="btn-3h">3時間部門</button>
     </div>
 
-    <div id="ranking-content">
-        <h2 id="current-dept">1時間部門</h2>
+    <h2 id="current-dept" style="text-align:center; color:#e67e22;">1時間部門</h2>
 
-        <div class="section-title">【アプデ武器防具なし】</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>形式</th>
-                    <th>1位</th>
-                    <th>2位</th>
-                    <th>3位</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>ソロ</td><td id="solo-no">---</td><td>---</td><td>---</td></tr>
-                <tr><td>タッグ</td><td id="tag-no">---</td><td>---</td><td>---</td></tr>
-                <tr><td>トリオ</td><td id="trio-no">---</td><td>---</td><td>---</td></tr>
-                <tr><td>フルパ</td><td id="full-no">---</td><td>---</td><td>---</td></tr>
-            </tbody>
-        </table>
-
-        <div class="section-title">【アプデ武器防具あり】</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>形式</th>
-                    <th>1位</th>
-                    <th>2位</th>
-                    <th>3位</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>ソロ</td><td id="solo-yes">---</td><td>---</td><td>---</td></tr>
-                <tr><td>タッグ</td><td id="tag-yes">---</td><td>---</td><td>---</td></tr>
-                <tr><td>トリオ</td><td id="trio-yes">---</td><td>---</td><td>---</td></tr>
-                <tr><td>フルパ</td><td id="full-yes">---</td><td>---</td><td>---</td></tr>
-            </tbody>
-        </table>
-    </div>
+    <div id="ranking-container">
+        </div>
 </div>
 
 <script>
-    // データ管理（ここにランキングの名前などを書き込みます）
-    const data = {
-        '1h': {
-            name: '1時間部門',
-            solo_no: 'ハンターA', tag_no: 'チームα', trio_no: '---', full_no: '---',
-            solo_yes: 'ハンターB', tag_yes: '---', trio_yes: '---', full_yes: '---'
-        },
-        '2h': {
-            name: '2時間部門',
-            solo_no: '---', tag_no: '---', trio_no: '---', full_no: '---',
-            solo_yes: '---', tag_yes: '---', trio_yes: '---', full_yes: '---'
-        },
-        '3h': {
-            name: '3時間部門',
-            solo_no: '---', tag_no: '---', trio_no: '---', full_no: '---',
-            solo_yes: '---', tag_yes: '---', trio_yes: '---', full_yes: '---'
-        }
-    };
+// ★ここを書き換えてデータを更新します
+const rankingData = {
+    '1h': {
+        name: '1時間部門',
+        tables: [
+            { title: 'アプデ武器防具なし', rows: [
+                { type: 'ソロ', players: ['名前A', '名前B', '---', '---', '---', '---', '---', '---', '---', '---'], pts: [1500, 1200, 0, 0, 0, 0, 0, 0, 0, 0] },
+                { type: 'タッグ', players: ['チームα', '---', '---', '---', '---', '---', '---', '---', '---', '---'], pts: [2500, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+                { type: 'トリオ', players: Array(10).fill('---'), pts: Array(10).fill(0) },
+                { type: 'フルパ', players: Array(10).fill('---'), pts: Array(10).fill(0) }
+            ]},
+            { title: 'アプデ武器防具あり', rows: [
+                { type: 'ソロ', players: Array(10).fill('---'), pts: Array(10).fill(0) },
+                { type: 'タッグ', players: Array(10).fill('---'), pts: Array(10).fill(0) },
+                { type: 'トリオ', players: Array(10).fill('---'), pts: Array(10).fill(0) },
+                { type: 'フルパ', players: Array(10).fill('---'), pts: Array(10).fill(0) }
+            ]}
+        ]
+    },
+    '2h': { name: '2時間部門', tables: [] }, // 1hと同様の構造をコピーして追加可能
+    '3h': { name: '3時間部門', tables: [] }
+};
 
-    function filter(dept) {
-        // ボタンの色変更
-        document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-' + dept).classList.add('active');
+function filter(dept) {
+    document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-' + dept).classList.add('active');
+    document.getElementById('current-dept').textContent = rankingData[dept].name;
 
-        // 表示の書き換え
-        document.getElementById('current-dept').textContent = data[dept].name;
-        document.getElementById('solo-no').textContent = data[dept].solo_no;
-        document.getElementById('tag-no').textContent = data[dept].tag_no;
-        document.getElementById('trio-no').textContent = data[dept].trio_no;
-        document.getElementById('full-no').textContent = data[dept].full_no;
+    const container = document.getElementById('ranking-container');
+    container.innerHTML = ''; 
+
+    const targetTables = rankingData[dept].tables.length > 0 ? rankingData[dept].tables : rankingData['1h'].tables;
+
+    targetTables.forEach(tableData => {
+        let html = `<div class="section-title">${tableData.title}</div>`;
         
-        document.getElementById('solo-yes').textContent = data[dept].solo_yes;
-        document.getElementById('tag-yes').textContent = data[dept].tag_yes;
-        document.getElementById('trio-yes').textContent = data[dept].trio_yes;
-        document.getElementById('full-yes').textContent = data[dept].full_yes;
-    }
+        tableData.rows.forEach(row => {
+            html += `<div class="mode-title">${row.type}</div>`;
+            html += `<div class="table-wrapper"><table><thead><tr><th width="10%">順位</th><th width="60%">プレイヤー/チーム名</th><th width="30%">ポイント</th></tr></thead><tbody>`;
+            
+            for(let i=0; i<10; i++) {
+                let rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+                html += `<tr class="${rankClass}"><td>${i+1}</td><td>${row.players[i]}</td><td>${row.pts[i].toLocaleString()} pt</td></tr>`;
+            }
+            html += `</tbody></table></div><br>`;
+        });
+        container.innerHTML += html;
+    });
+}
 
-    // 初期表示
-    filter('1h');
+// 初期実行
+filter('1h');
 </script>
 
 </body>
