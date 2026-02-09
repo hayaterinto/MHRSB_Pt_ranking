@@ -7,32 +7,20 @@
     <style>
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #121212; color: #ecf0f1; padding: 10px; margin: 0; }
         .container { max-width: 1000px; margin: 20px auto; background: #2c3e50; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
-        
-        /* ヘッダー */
         .header-area { text-align: center; margin-bottom: 30px; }
         h1 { color: #f1c40f; font-size: 2em; margin: 0; text-shadow: 2px 2px 4px #000; }
         .sub-title { color: #e67e22; font-size: 1.8em; font-weight: bold; display: block; margin-top: 10px; }
-        
-        /* 大カテゴリータブ */
         .category-tabs { display: flex; justify-content: center; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid #444; padding-bottom: 15px; }
         .cat-btn { padding: 10px 15px; cursor: pointer; border: none; background: #34495e; color: #bdc3c7; font-weight: bold; border-radius: 5px; flex: 1; max-width: 200px; }
         .cat-btn.active { background: #e74c3c; color: white; }
-
-        /* 時間部門タブ */
         .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
         .tab-btn { padding: 10px 20px; cursor: pointer; border: 2px solid #e67e22; border-radius: 5px; background: transparent; color: #e67e22; font-weight: bold; }
         .tab-btn.active { background: #e67e22; color: white; }
-
-        /* チェックボックス */
         .filter-area { background: #34495e; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
         .filter-area label { margin: 0 10px; font-weight: bold; cursor: pointer; }
-
-        /* タイトル表示 */
         #display-title { text-align: center; margin: 30px 0; }
         .current-cat-name { display: block; font-size: 1.5em; color: #bdc3c7; }
         .current-dept-name { display: block; font-size: 2.5em; color: #f39c12; font-weight: bold; border-bottom: 3px double #f39c12; }
-
-        /* テーブル */
         .section-title { background: #c0392b; color: white; padding: 10px; margin-top: 40px; text-align: center; font-size: 1.4em; border-radius: 5px; }
         .mode-title { text-align: center; font-size: 2em; font-weight: bold; margin: 30px 0 10px 0; display: block; }
         .table-wrapper { overflow-x: auto; margin-bottom: 30px; }
@@ -63,10 +51,10 @@
     </div>
 
     <div class="filter-area">
-        <label><input type="checkbox" checked onchange="render()" value="solo"> ソロ（1人）</label>
-        <label><input type="checkbox" checked onchange="render()" value="tag"> タッグ（2人）</label>
-        <label><input type="checkbox" checked onchange="render()" value="trio"> トリオ（3人）</label>
-        <label><input type="checkbox" checked onchange="render()" value="full"> フルパ（4人）</label>
+        <label><input type="checkbox" checked onchange="render()" id="f-solo"> ソロ（1人）</label>
+        <label><input type="checkbox" checked onchange="render()" id="f-tag"> タッグ（2人）</label>
+        <label><input type="checkbox" checked onchange="render()" id="f-trio"> トリオ（3人）</label>
+        <label><input type="checkbox" checked onchange="render()" id="f-full"> フルパ（4人）</label>
     </div>
 
     <div id="display-title">
@@ -83,7 +71,7 @@ const config = {
     modes: [{id:'solo', label:'ソロ（1人）'}, {id:'tag', label:'タッグ（2人）'}, {id:'trio', label:'トリオ（3人）'}, {id:'full', label:'フルパ（4人）'}]
 };
 
-// データ管理 (ここで各ページ・各時間のデータを設定)
+// ★ここがランキングのデータです
 const rankingData = {
     'general': {
         '1h': { 'アプデなし': { 'solo': { players:['早矢りんと'], pts:[575] } } },
@@ -91,10 +79,10 @@ const rankingData = {
         '3h': { 'アプデなし': { 'solo': { players:['早矢りんと'], pts:[1500] } } }
     },
     'streamer_only': {
-        '1h': { 'アプデなし': { 'solo': { players:['配信者X'], pts:[800] } } }
+        '1h': { 'アプデなし': { 'solo': { players:['配信者サンプル'], pts:[999] } } }
     },
     'streamer_collab': {
-        '1h': { 'アプデなし': { 'tag': { players:['配信者Y＆リスナー'], pts:[2000] } } }
+        '1h': { 'アプデなし': { 'tag': { players:['配信協力サンプル'], pts:[888] } } }
     }
 };
 
@@ -105,7 +93,7 @@ function changeCategory(id) {
     currentCat = id;
     document.querySelectorAll('.cat-btn').forEach(b => {
         b.classList.remove('active');
-        if(b.innerText === config.categories[id]) b.classList.add('active');
+        if(b.textContent === config.categories[id]) b.classList.add('active');
     });
     document.getElementById('current-cat').textContent = config.categories[id];
     render();
@@ -122,40 +110,50 @@ function changeDept(id) {
 function render() {
     const area = document.getElementById('ranking-area');
     area.innerHTML = '';
-    const activeFilters = Array.from(document.querySelectorAll('.filter-area input:checked')).map(i => i.value);
     
-    // 現在のカテゴリと時間に基づいたデータを取得
+    // チェックの状態を取得
+    const activeFilters = [];
+    if(document.getElementById('f-solo').checked) activeFilters.push('solo');
+    if(document.getElementById('f-tag').checked) activeFilters.push('tag');
+    if(document.getElementById('f-trio').checked) activeFilters.push('trio');
+    if(document.getElementById('f-full').checked) activeFilters.push('full');
+    
     const dataSet = (rankingData[currentCat] && rankingData[currentCat][currentDept]) ? rankingData[currentCat][currentDept] : {};
 
-    // セクション（アプデなし・あり）ごとにループ
-    const sections = ['アプデ武器防具なし', 'アプデ武器防具あり'];
-    sections.forEach(sTitle => {
-        let html = `<div class="section-title">【${sTitle}】</div>`;
-        let hasData = false;
-        
+    // セクションタイトルをデータと一致させました
+    const sections = [
+        { key: 'アプデなし', display: 'アプデ武器防具なし' },
+        { key: 'アプデあり', display: 'アプデ武器防具あり' }
+    ];
+
+    sections.forEach(s => {
+        let sectionHtml = `<div class="section-title">【${s.display}】</div>`;
+        let hasVisibleTable = false;
+
         config.modes.forEach(m => {
             if(activeFilters.includes(m.id)) {
-                hasData = true;
-                html += `<span class="mode-title">${m.label}</span><div class="table-wrapper"><table><thead><tr><th width="15%">順位</th><th>プレイヤー名</th><th width="25%">ポイント</th></tr></thead><tbody>`;
+                hasVisibleTable = true;
+                sectionHtml += `<span class="mode-title">${m.label}</span><div class="table-wrapper"><table><thead><tr><th width="15%">順位</th><th>プレイヤー名</th><th width="25%">ポイント</th></tr></thead><tbody>`;
                 
-                // データの流し込み（sTitleのキーがデータにあるか確認）
-                const d = (dataSet[sTitle] && dataSet[sTitle][m.id]) ? dataSet[sTitle][m.id] : {players:[], pts:[]};
+                // データの取得
+                const d = (dataSet[s.key] && dataSet[s.key][m.id]) ? dataSet[s.key][m.id] : {players:[], pts:[]};
                 
                 for(let i=0; i<10; i++){
                     const rank = i+1;
-                    const p = d.players[i] || '---';
-                    const pt = d.pts[i] ? d.pts[i].toLocaleString() + ' pt' : '---';
+                    const name = d.players[i] || '---';
+                    const point = d.pts[i] ? d.pts[i].toLocaleString() + ' pt' : '---';
                     const cls = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'';
-                    html += `<tr class="${cls}"><td>${rank}位</td><td>${p}</td><td>${pt}</td></tr>`;
+                    sectionHtml += `<tr class="${cls}"><td>${rank}位</td><td>${name}</td><td>${point}</td></tr>`;
                 }
-                html += `</tbody></table></div>`;
+                sectionHtml += `</tbody></table></div>`;
             }
         });
-        if(hasData) area.innerHTML += html;
+        if(hasVisibleTable) area.innerHTML += sectionHtml;
     });
 }
 
-render();
+// ページ読み込み時に実行
+window.onload = render;
 </script>
 </body>
 </html>
