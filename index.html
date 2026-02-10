@@ -9,22 +9,31 @@
         .container { max-width: 1000px; margin: 20px auto; background: #2c3e50; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
         .header-area { text-align: center; margin-bottom: 30px; }
         h1 { color: #f1c40f; font-size: 2em; margin: 0; text-shadow: 2px 2px 4px #000; }
-        /* 【修正】一行にまとめ、サイズを微調整 */
         .sub-title { color: #e67e22; font-size: 2em; font-weight: bold; display: block; margin-top: 10px; white-space: nowrap; }
         
-        .category-tabs { display: flex; justify-content: center; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid #444; padding-bottom: 15px; }
-        .cat-btn { padding: 10px 15px; cursor: pointer; border: none; background: #34495e; color: #bdc3c7; font-weight: bold; border-radius: 5px; flex: 1; max-width: 200px; transition: 0.3s; }
-        .cat-btn.active { background: #e74c3c; color: white; }
-        .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
-        .tab-btn { padding: 10px 20px; cursor: pointer; border: 2px solid #e67e22; border-radius: 5px; background: transparent; color: #e67e22; font-weight: bold; transition: 0.3s; }
-        .tab-btn.active { background: #e67e22; color: white; }
-        .filter-area { background: #34495e; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
-        .filter-area label { margin: 0 10px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        /* タブ・ボタン共通 */
+        .tabs, .sub-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
+        button { cursor: pointer; border: 2px solid #e67e22; border-radius: 5px; background: transparent; color: #e67e22; font-weight: bold; transition: 0.3s; padding: 8px 15px; }
+        button.active { background: #e67e22; color: white; }
+        
+        /* カテゴリ・条件選択 */
+        .category-tabs .cat-btn { flex: 1; max-width: 200px; border: none; background: #34495e; color: #bdc3c7; }
+        .category-tabs .cat-btn.active { background: #e74c3c; color: white; }
+
+        /* 条件選択エリア */
+        .option-area { background: #34495e; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; border: 1px solid #444; }
+        .option-group { margin: 10px 0; }
+        .option-label { display: block; font-size: 0.9em; color: #bdc3c7; margin-bottom: 5px; }
+
+        .filter-area { background: #2c3e50; padding: 10px; text-align: center; border-radius: 5px; }
+        .filter-area label { margin: 0 10px; font-weight: bold; cursor: pointer; }
+
         #display-title { text-align: center; margin: 30px 0; }
-        .current-cat-name { display: block; font-size: 1.5em; color: #bdc3c7; }
-        .current-dept-name { display: block; font-size: 2.5em; color: #f39c12; font-weight: bold; border-bottom: 3px double #f39c12; }
-        .section-title { background: #c0392b; color: white; padding: 10px; margin-top: 40px; text-align: center; font-size: 1.4em; border-radius: 5px; }
-        .mode-title { text-align: center; font-size: 2em; font-weight: bold; margin: 30px 0 10px 0; display: block; color: #fff; }
+        .current-cat-name { display: block; font-size: 1.2em; color: #bdc3c7; }
+        .current-dept-name { display: block; font-size: 2.2em; color: #f39c12; font-weight: bold; }
+        .current-options { color: #f1c40f; font-size: 1.1em; margin-top: 5px; }
+
+        .mode-title { text-align: center; font-size: 1.8em; font-weight: bold; margin: 40px 0 10px 0; display: block; color: #fff; border-left: 5px solid #e67e22; border-right: 5px solid #e67e22; }
         .table-wrapper { overflow-x: auto; margin-bottom: 30px; }
         table { width: 100%; border-collapse: collapse; background: #fff; color: #333; min-width: 600px; border-radius: 5px; overflow: hidden; }
         th, td { padding: 12px; border: 1px solid #bdc3c7; text-align: center; }
@@ -42,40 +51,58 @@
         <span class="sub-title">早矢りんと杯</span>
     </div>
 
-    <div class="category-tabs">
-        <button class="cat-btn active" onclick="changeCategory('general')">一般部門</button>
-        <button class="cat-btn" onclick="changeCategory('streamer_only')">配信者限定</button>
-        <button class="cat-btn" onclick="changeCategory('streamer_collab')">配信者枠協力</button>
+    <div class="category-tabs tabs">
+        <button class="cat-btn active" onclick="update('cat', 'general')">一般部門</button>
+        <button class="cat-btn" onclick="update('cat', 'streamer_only')">配信者限定</button>
+        <button class="cat-btn" onclick="update('cat', 'streamer_collab')">配信者枠協力</button>
     </div>
 
-    <div class="tabs">
-        <button class="tab-btn active" onclick="changeDept('1h')" id="btn-1h">1時間部門</button>
-        <button class="tab-btn" onclick="changeDept('2h')" id="btn-2h">2時間部門</button>
-        <button class="tab-btn" onclick="changeDept('3h')" id="btn-3h">3時間部門</button>
+    <div class="option-area">
+        <div class="option-group">
+            <span class="option-label">【時間部門】</span>
+            <div class="tabs">
+                <button class="dept-btn active" onclick="update('dept', '1h')">1時間</button>
+                <button class="dept-btn" onclick="update('dept', '2h')">2時間</button>
+                <button class="dept-btn" onclick="update('dept', '3h')">3時間</button>
+            </div>
+        </div>
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+            <div class="option-group">
+                <span class="option-label">【アプデ武器防具】</span>
+                <div class="sub-tabs">
+                    <button class="upd-btn active" onclick="update('upd', 'no')">なし</button>
+                    <button class="upd-btn" onclick="update('upd', 'yes')">あり</button>
+                </div>
+            </div>
+            <div class="option-group">
+                <span class="option-label">【闘技場クエスト】</span>
+                <div class="sub-tabs">
+                    <button class="arena-btn active" onclick="update('arena', 'no')">なし</button>
+                    <button class="arena-btn" onclick="update('arena', 'yes')">あり</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="filter-area">
-        <label><input type="checkbox" checked onchange="render()" id="f-solo"> ソロ（1人）</label>
-        <label><input type="checkbox" checked onchange="render()" id="f-tag"> タッグ（2人）</label>
-        <label><input type="checkbox" checked onchange="render()" id="f-trio"> トリオ（3人）</label>
-        <label><input type="checkbox" checked onchange="render()" id="f-full"> フルパ（4人）</label>
+        <label><input type="checkbox" checked onchange="render()" id="f-solo"> ソロ</label>
+        <label><input type="checkbox" checked onchange="render()" id="f-tag"> タッグ</label>
+        <label><input type="checkbox" checked onchange="render()" id="f-trio"> トリオ</label>
+        <label><input type="checkbox" checked onchange="render()" id="f-full"> フルパ</label>
     </div>
 
     <div id="display-title">
-        <span id="current-cat" class="current-cat-name">一般部門</span>
-        <span id="current-dept" class="current-dept-name">1時間部門</span>
+        <span id="txt-cat" class="current-cat-name">一般部門</span>
+        <span id="txt-dept" class="current-dept-name">1時間部門</span>
+        <div id="txt-opts" class="current-options">アプデなし / 闘技場なし</div>
     </div>
 
     <div id="ranking-area"></div>
 </div>
 
 <script>
-const config = {
-    categories: { 'general': '一般部門', 'streamer_only': '配信者限定', 'streamer_collab': '配信者枠協力' },
-    modes: [{id:'solo', label:'ソロ（1人）'}, {id:'tag', label:'タッグ（2人）'}, {id:'trio', label:'トリオ（3人）'}, {id:'full', label:'フルパ（4人）'}]
-};
-
-const setRankData = (playerList, pointList) => {
+// データ作成用関数
+const setRankData = (playerList=[], pointList=[]) => {
     const players = Array(10).fill('---');
     const pts = Array(10).fill(0);
     playerList.forEach((name, i) => { if(i < 10) players[i] = name; });
@@ -83,84 +110,83 @@ const setRankData = (playerList, pointList) => {
     return { players, pts };
 };
 
+// ★全データ（ここを書き換えて更新）
 const rankingData = {
-    'general': {
-        '1h': { 'アプデなし': { 
-            'solo': setRankData(['チャト', '早矢りんと', 'フェンリル'], [920, 575, 465]),
-            'tag':  setRankData(['チームα', 'チームβ'], [1200, 1100]),
-            'trio': setRankData(['トリオA', 'トリオB'], [1500, 1400]),
-            'full': setRankData(['フルパA', 'フルパB'], [2000, 1800])
-        } },
-        '2h': { 'アプデなし': { 
-            'solo': setRankData(['早矢りんと', '一般参加B'], [1000, 800])
-        } },
-        '3h': { 'アプデなし': { 
-            'solo': setRankData(['早矢りんと', '一般参加C'], [1500, 1200])
-        } }
+    general: {
+        '1h': {
+            'upd-no_arena-no': { // アプデなし・闘技場なし
+                solo: setRankData(['チャトラ', '早矢りんと', 'フェンリル'], [920, 575, 475]),
+                tag:  setRankData(['チームα'], [1200])
+            },
+            'upd-no_arena-yes': { // アプデなし・闘技場あり
+                solo: setRankData(['闘技場王'], [1500])
+            },
+            'upd-yes_arena-no': { solo: setRankData(['アプデ勢A'], [2000]) },
+            'upd-yes_arena-yes': { solo: setRankData(['最強ハンター'], [3000]) }
+        },
+        '2h': { 'upd-no_arena-no': { solo: setRankData(['早矢りんと'], [1000]) } },
+        '3h': { 'upd-no_arena-no': { solo: setRankData(['早矢りんと'], [1500]) } }
     },
-    'streamer_only': {
-        '1h': { 'アプデなし': { 'solo': setRankData(['配信者A', '配信者B'], [800, 750]) } }
-    },
-    'streamer_collab': {
-        '1h': { 'アプデなし': { 'solo': setRankData(['協力ソロA', '協力ソロB'], [700, 650]) } }
-    }
+    streamer_only: { '1h': { 'upd-no_arena-no': { solo: setRankData(['配信者A'], [800]) } } },
+    streamer_collab: { '1h': { 'upd-no_arena-no': { solo: setRankData(['協力者X'], [700]) } } }
 };
 
-let currentCat = 'general';
-let currentDept = '1h';
+// 現在の選択状態
+let state = { cat: 'general', dept: '1h', upd: 'no', arena: 'no' };
 
-function changeCategory(id) {
-    currentCat = id;
-    document.querySelectorAll('.cat-btn').forEach(b => {
+function update(key, value) {
+    state[key] = value;
+    
+    // ボタンの見た目更新
+    const btnMap = { cat:'cat-btn', dept:'dept-btn', upd:'upd-btn', arena:'arena-btn' };
+    document.querySelectorAll('.' + btnMap[key]).forEach(b => {
         b.classList.remove('active');
-        if(b.textContent === config.categories[id]) b.classList.add('active');
+        const labels = { general:'一般部門', streamer_only:'配信者限定', streamer_collab:'配信者枠協力', '1h':'1時間', '2h':'2時間', '3h':'3時間', no:'なし', yes:'あり' };
+        if(b.textContent === labels[value]) b.classList.add('active');
     });
-    document.getElementById('current-cat').textContent = config.categories[id];
-    render();
-}
 
-function changeDept(id) {
-    currentDept = id;
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-'+id).classList.add('active');
-    document.getElementById('current-dept').textContent = id.replace('h','時間部門');
     render();
 }
 
 function render() {
+    // テキスト更新
+    const catNames = { general:'一般部門', streamer_only:'配信者限定', streamer_collab:'配信者枠協力' };
+    document.getElementById('txt-cat').textContent = catNames[state.cat];
+    document.getElementById('txt-dept').textContent = state.dept.replace('h', '時間部門');
+    document.getElementById('txt-opts').textContent = `アプデ${state.upd === 'yes' ? 'あり' : 'なし'} / 闘技場${state.arena === 'yes' ? 'あり' : 'なし'}`;
+
     const area = document.getElementById('ranking-area');
     area.innerHTML = '';
-    const activeFilters = [];
-    if(document.getElementById('f-solo').checked) activeFilters.push('solo');
-    if(document.getElementById('f-tag').checked) activeFilters.push('tag');
-    if(document.getElementById('f-trio').checked) activeFilters.push('trio');
-    if(document.getElementById('f-full').checked) activeFilters.push('full');
     
-    const dataSet = (rankingData[currentCat] && rankingData[currentCat][currentDept]) ? rankingData[currentCat][currentDept] : {};
-    const sections = [{ key: 'アプデなし', display: 'アプデ武器防具なし' }, { key: 'アプデあり', display: 'アプデ武器防具あり' }];
+    // フィルタ
+    const activeModes = [];
+    if(document.getElementById('f-solo').checked) activeModes.push('solo');
+    if(document.getElementById('f-tag').checked) activeModes.push('tag');
+    if(document.getElementById('f-trio').checked) activeModes.push('trio');
+    if(document.getElementById('f-full').checked) activeModes.push('full');
 
-    sections.forEach(s => {
-        let sectionHtml = `<div class="section-title">【${s.display}】</div>`;
-        let hasVisibleTable = false;
+    // データ抽出
+    const dataKey = `upd-${state.upd}_arena-${state.arena}`;
+    const currentData = (rankingData[state.cat] && rankingData[state.cat][state.dept] && rankingData[state.cat][state.dept][dataKey]) 
+                        ? rankingData[state.cat][state.dept][dataKey] : {};
 
-        config.modes.forEach(m => {
-            if(activeFilters.includes(m.id)) {
-                hasVisibleTable = true;
-                sectionHtml += `<span class="mode-title">${m.label}</span><div class="table-wrapper"><table><thead><tr><th width="15%">順位</th><th>プレイヤー名</th><th width="25%">ポイント</th></tr></thead><tbody>`;
-                const d = (dataSet[s.key] && dataSet[s.key][m.id]) ? dataSet[s.key][m.id] : setRankData([], []);
-                for(let i=0; i<10; i++){
-                    const rank = i+1;
-                    const name = d.players[i] || '---';
-                    const point = d.pts[i] ? d.pts[i].toLocaleString() + ' pt' : '---';
-                    const cls = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'';
-                    sectionHtml += `<tr class="${cls}"><td>${rank}位</td><td>${name}</td><td>${point}</td></tr>`;
-                }
-                sectionHtml += `</tbody></table></div>`;
+    const modes = [{id:'solo', label:'ソロ（1人）'}, {id:'tag', label:'タッグ（2人）'}, {id:'trio', label:'トリオ（3人）'}, {id:'full', label:'フルパ（4人）'}];
+
+    modes.forEach(m => {
+        if(activeModes.includes(m.id)) {
+            let html = `<span class="mode-title">${m.label}</span><div class="table-wrapper"><table><thead><tr><th width="15%">順位</th><th>プレイヤー名</th><th width="25%">ポイント</th></tr></thead><tbody>`;
+            const d = currentData[m.id] || setRankData();
+            for(let i=0; i<10; i++) {
+                const rank = i+1;
+                const cls = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'';
+                html += `<tr class="${cls}"><td>${rank}位</td><td>${d.players[i]}</td><td>${d.pts[i] ? d.pts[i].toLocaleString() + ' pt' : '---'}</td></tr>`;
             }
-        });
-        if(hasVisibleTable) area.innerHTML += sectionHtml;
+            html += `</tbody></table></div>`;
+            area.innerHTML += html;
+        }
     });
 }
+
 window.onload = render;
 </script>
 </body>
