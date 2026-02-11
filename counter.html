@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>MHRS Point Counter - Navy Edition</title>
+    <style>
+        :root {
+            --bg-color: #001f3f; /* 背景を紺色に変更 */
+            --panel-bg: rgba(0, 0, 0, 0.7); 
+            --accent-color: #ff8800; /* オレンジ */
+            --border-color: #444444;
+            --text-white: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Meiryo', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-white);
+        }
+
+        /* スロットエリア */
+        #total-panel {
+            background-color: var(--panel-bg);
+            padding: 25px 35px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin: 20px 0;
+            border: 2px solid var(--accent-color); /* 紺に映えるようオレンジ枠に */
+        }
+
+        .slot-container { display: flex; gap: 8px; }
+        .digit-box {
+            width: 65px; height: 85px;
+            background-color: #000000;
+            border: 4px solid var(--accent-color);
+            border-radius: 8px; overflow: hidden;
+            font-size: 55px; font-weight: bold; line-height: 85px;
+            color: var(--accent-color); 
+            text-align: center;
+        }
+
+        .reel { position: relative; height: 85px; }
+        .is-spinning { animation: spinning 0.1s infinite linear; }
+        @keyframes spinning { 0% { transform: translateY(0); } 100% { transform: translateY(-100%); } }
+
+        .controls { display: flex; gap: 10px; }
+        .controls button { 
+            width: 60px; padding: 12px 0; 
+            font-size: 18px; cursor: pointer; 
+            background: #222; color: #fff; 
+            border: 1px solid #666; font-weight: bold;
+            border-radius: 6px;
+        }
+        
+        .audio-controls { display: flex; gap: 15px; margin-top: 5px; }
+        .audio-controls button { padding: 10px 20px; font-size: 14px; cursor: pointer; border-radius: 6px; background: #222; color: #fff; border: 1px solid #666; }
+
+        .monster-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 220px);
+            gap: 12px;
+            padding-bottom: 50px;
+        }
+
+        .monster-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--panel-bg);
+            padding: 15px 0;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .counter-ctrl {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .btn-calc {
+            width: 45px; height: 50px;
+            background: #333; color: white; border: 1px solid #555;
+            cursor: pointer; font-weight: bold; font-size: 26px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-minus { border-radius: 8px 0 0 8px; }
+        .btn-plus { border-radius: 0 8px 8px 0; }
+
+        .count-input {
+            width: 65px; height: 46px;
+            background-color: #000000;
+            color: var(--accent-color);
+            border: 1px solid #555; border-left: none; border-right: none;
+            text-align: center; font-size: 32px; font-weight: 900;
+            -moz-appearance: textfield;
+        }
+        .count-input::-webkit-outer-spin-button,
+        .count-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+        .icon-frame {
+            width: 80px; height: 80px;
+            border: 1px solid #444; background: #000;
+            border-radius: 6px; overflow: hidden;
+        }
+        .icon-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+        .monster-name {
+            font-size: 14px; font-weight: 900; margin-top: 8px;
+            text-align: center; width: 200px; color: #ffffff;
+        }
+
+        .category-header {
+            width: 680px; background-color: rgba(0,0,0,0.9);
+            color: var(--accent-color);
+            padding: 12px; margin: 25px 0 15px 0;
+            cursor: pointer; border-radius: 8px; font-weight: bold; font-size: 18px;
+            text-align: center; border: 1px solid var(--accent-color);
+        }
+
+        .hidden { display: none !important; }
+        .small-disabled { opacity: 0.2; filter: grayscale(1); pointer-events: none; }
+        .btn-reset { background-color: #600 !important; }
+
+        .config-bar {
+            background-color: var(--panel-bg);
+            padding: 12px 40px;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+<div id="total-panel">
+    <div class="slot-container">
+        <div class="digit-box"><div id="d10000" class="reel">?</div></div>
+        <div class="digit-box"><div id="d1000" class="reel">?</div></div>
+        <div class="digit-box"><div id="d100" class="reel">?</div></div>
+        <div class="digit-box"><div id="d10" class="reel">?</div></div>
+        <div class="digit-box"><div id="d1" class="reel">?</div></div>
+    </div>
+    <div class="controls">
+        <button onclick="reveal('d10000', 0)">万</button>
+        <button onclick="reveal('d1000', 1)">千</button>
+        <button onclick="reveal('d100', 2)">百</button>
+        <button onclick="reveal('d10', 3)">十</button>
+        <button onclick="reveal('d1', 4)">一</button>
+    </div>
+    <div class="audio-controls">
+        <button onclick="playDrum()">🥁 ドラム</button>
+        <button onclick="playCheer()">🎉 歓声</button>
+        <button class="btn-reset" onclick="resetSlots()">RESET</button>
+    </div>
+</div>
+
+<div class="config-bar">
+    <label><input type="checkbox" id="enable-small" checked onchange="handleSmallToggle()"> 小型モンスター有効 (5pt)</label>
+</div>
+
+<div class="category-header" onclick="toggleSection('small-grid')">▼ 小型モンスター</div>
+<div id="small-grid" class="monster-grid"></div>
+
+<div class="category-header" onclick="toggleSection('large-grid')">▼ 大型モンスター</div>
+<div id="large-grid" class="monster-grid"></div>
+
+<audio id="se-drum" src="SE/ドラムロール.mp3"></audio>
+<audio id="se-don" src="SE/ドン.mp3"></audio>
+<audio id="se-dodon" src="SE/ドドン.mp3"></audio>
+<audio id="se-cheer" src="SE/歓声.mp3"></audio>
+
+<script>
+// モンスターデータは提供されたものをそのまま使用
+const smallMonsters = [
+    { name: "アイルー", icon: "air.jpg" }, { name: "メラルー", icon: "mrr.jpg" },
+    { name: "ケルビ", icon: "krb.jpg" }, { name: "ブンブジナ", icon: "bnb.jpg" },
+    { name: "ガーグァ", icon: "ggg.jpg" }, { name: "ポポ", icon: "ppo.jpg" },
+    { name: "ガウシカ", icon: "gsk.jpg" }, { name: "ズワロポス", icon: "zwr.jpg" },
+    { name: "ケストドン", icon: "kstd.jpg" }, { name: "リノプロス", icon: "rno.jpg" },
+    { name: "メルクー", icon: "mrk.jpg" }, { name: "ブルファンゴ", icon: "brf.jpg" },
+    { name: "ジャグラス", icon: "jgr.jpg" }, { name: "スクアギル", icon: "skg.jpg" },
+    { name: "デルクス", icon: "drk.jpg" }, { name: "ルドロス", icon: "rdr.jpg" },
+    { name: "ウロコトル", icon: "ukt.jpg" }, { name: "ツケヒバキ", icon: "tkb.jpg" },
+    { name: "ハゼヒバキ", icon: "hzb.jpg" }, { name: "ヤオザミ", icon: "yzm.jpg" },
+    { name: "ガミザミ", icon: "gzm.jpg" }, { name: "ブナハブラ", icon: "bhb.jpg" },
+    { name: "オルタロス", icon: "ort.jpg" }, { name: "ガライーバ", icon: "gri.jpg" },
+    { name: "ガブラス", icon: "gbr.jpg" }, { name: "カンタロス", icon: "ktr.jpg" },
+    { name: "ランゴスタ", icon: "rgs.jpg" }, { name: "イズチ", icon: "izc.jpg" },
+    { name: "フロギィ", icon: "frg.jpg" }, { name: "バギィ", icon: "bgy.jpg" },
+    { name: "ジャギィ", icon: "jgy.jpg" }, { name: "ジャギィノス", icon: "jgn.jpg" },
+    { name: "ランポス", icon: "rnp.jpg" }, { name: "オルギィ", icon: "org.jpg" }
+];
+
+const largeMonsters = [
+    { name: "オサイズチ", danger: 1, icon: "osi.jpg" }, { name: "ドスバギィ", danger: 1, icon: "dbg.jpg" },
+    { name: "アオアシラ", danger: 1, icon: "aas.jpg" }, { name: "ウルクスス", danger: 1, icon: "uks.jpg" },
+    { name: "クルルヤック", danger: 2, icon: "kry.jpg" }, { name: "ドスフロギィ", danger: 2, icon: "dfg.jpg" },
+    { name: "アケノシルム", danger: 2, icon: "aks.jpg" }, { name: "フルフル", danger: 2, icon: "hrh.jpg" },
+    { name: "ヨツミワドウ", danger: 2, icon: "ytm.jpg" }, { name: "ロアルドロス", danger: 3, icon: "rrd.jpg" },
+    { name: "ボルボロス", danger: 3, icon: "brb.jpg" }, { name: "バサルモス", danger: 3, icon: "bsr.jpg" },
+    { name: "ラングロトラ", danger: 4, icon: "rng.jpg" }, { name: "ビシュテンゴ", danger: 4, icon: "bst.jpg" },
+    { name: "プケプケ", danger: 4, icon: "pkp.jpg" }, { name: "ジュラトドス", danger: 4, icon: "jrd.jpg" },
+    { name: "リオレイア", danger: 4, icon: "rory.jpg" }, { name: "ダイミョウザザミ", danger: 5, icon: "dmz.jpg" },
+    { name: "イソネミクニ", danger: 5, icon: "inm.jpg" }, { name: "ベリオロス", danger: 5, icon: "brr.jpg" },
+    { name: "トビカガチ", danger: 5, icon: "tbk.jpg" }, { name: "ビシュテンゴ亜種", danger: 6, icon: "bstA.jpg" },
+    { name: "イソネミクニ亜種", danger: 6, icon: "inmA.jpg" }, { name: "アンジャナフ", danger: 6, icon: "ajn.jpg" },
+    { name: "ナルガクルガ", danger: 6, icon: "nrk.jpg" }, { name: "タマミツネ", danger: 6, icon: "tmm.jpg" },
+    { name: "ガランゴルム", danger: 6, icon: "grg.jpg" }, { name: "ショウグンギザミ", danger: 6, icon: "sgg.jpg" },
+    { name: "リオレウス", danger: 6, icon: "roru.jpg" }, { name: "ジンオウガ", danger: 6, icon: "jog.jpg" },
+    { name: "マガイマガド", danger: 7, icon: "mgm.jpg" }, { name: "ゴシャハギ", danger: 7, icon: "gsh.jpg" },
+    { name: "オロミドロ", danger: 7, icon: "orm.jpg" }, { name: "オロミドロ亜種", danger: 7, icon: "ormA.jpg" },
+    { name: "ルナガロン", danger: 7, icon: "rngr.jpg" }, { name: "ライゼクス", danger: 7, icon: "rzk.jpg" },
+    { name: "エスピナス", danger: 7, icon: "epn.jpg" }, { name: "ゴア・マガラ", danger: 7, icon: "gam.jpg" },
+    { name: "セルレギオス", danger: 7, icon: "srg.jpg" }, { name: "ティガレックス", danger: 7, icon: "tgr.jpg" },
+    { name: "ディアブロス", danger: 7, icon: "dab.jpg" }, { name: "ヤツカダキ", danger: 7, icon: "ytk.jpg" },
+    { name: "ヤツカダキ亜種", danger: 7, icon: "ytkA.jpg" }, { name: "クシャルダオラ", danger: 8, icon: "ksd.jpg" },
+    { name: "オオナズチ", danger: 8, icon: "onz.jpg" }, { name: "テオ・テスカトル", danger: 8, icon: "tot.jpg" },
+    { name: "メル・ゼナ", danger: 8, icon: "mrz.jpg" }, { name: "シャガルマガラ", danger: 8, icon: "sgm.jpg" },
+    { name: "ラージャン", danger: 8, icon: "rjn.jpg" }, { name: "バゼルギウス", danger: 8, icon: "bzg.jpg" },
+    { name: "ヌシ・アオアシラ", danger: 8, icon: "naas.jpg" }, { name: "ヌシ・リオレイア", danger: 8, icon: "nror.jpg" },
+    { name: "リオレイア希少種", danger: 9, icon: "roryK.jpg" }, { name: "ナルガクルガ希少種", danger: 9, icon: "nrkK.jpg" },
+    { name: "タマミツネ希少種", danger: 9, icon: "tmmK.jpg" }, { name: "リオレウス希少種", danger: 9, icon: "roruK.jpg" },
+    { name: "エスピナス亜種", danger: 9, icon: "epnA.jpg" }, { name: "イヴェルカーナ", danger: 9, icon: "ivk.jpg" },
+    { name: "激昂したラージャン", danger: 9, icon: "grjn.jpg" }, { name: "紅蓮滾るバゼルギウス", danger: 9, icon: "gbzg.jpg" },
+    { name: "イブシマキヒコ", danger: 9, icon: "ism.jpg" }, { name: "ヌシ・タマミツネ", danger: 9, icon: "ntmm.jpg" },
+    { name: "ヌシ・リオレウス", danger: 9, icon: "nroru.jpg" }, { name: "怨嗟響めくマガイマガド", danger: 10, icon: "emgm.jpg" },
+    { name: "渾沌に呻くゴア・マガラ", danger: 10, icon: "kgam.jpg" }, { name: "傀異克服クシャルダオラ", danger: 10, icon: "kksd.jpg" },
+    { name: "傀異克服オオナズチ", danger: 10, icon: "konz.jpg" }, { name: "傀異克服テオ・テスカトル", danger: 10, icon: "ktot.jpg" },
+    { name: "原初を刻むメル・ゼナ", danger: 10, icon: "gmrz.jpg" }, { name: "傀異克服シャガルマガラ", danger: 10, icon: "ksgm.jpg" },
+    { name: "ナルハタタヒメ", danger: 10, icon: "nrh.jpg" }, { name: "百竜の淵源ナルハタタヒメ", danger: 10, icon: "enrh.jpg" },
+    { name: "バルファルク", danger: 10, icon: "brfr.jpg" }, { name: "傀異克服バルファルク", danger: 10, icon: "kbrf.jpg" },
+    { name: "ガイアデルム", danger: 10, icon: "gad.jpg" }, { name: "アマツマガツチ", danger: 10, icon: "amm.jpg" },
+    { name: "ヌシ・ディアブロス", danger: 10, icon: "ndab.jpg" }, { name: "ヌシ・ジンオウガ", danger: 10, icon: "njog.jpg" }
+];
+
+let isConfirmed = { d10000: false, d1000: false, d100: false, d10: false, d1: false };
+window.totalPoints = 0;
+
+function init() {
+    renderGrid('small-grid', smallMonsters, 'small-in');
+    renderGrid('large-grid', largeMonsters, 'large-in');
+}
+
+function renderGrid(id, data, cls) {
+    const grid = document.getElementById(id);
+    data.forEach((m, i) => {
+        grid.innerHTML += `
+            <div class="monster-item">
+                <div class="counter-ctrl">
+                    <button class="btn-calc btn-minus" onclick="changeCount('${cls}', ${i}, -1)">-</button>
+                    <input type="number" class="count-input ${cls}" data-danger="${m.danger||0}" value="0" onchange="calculateAll()">
+                    <button class="btn-calc btn-plus" onclick="changeCount('${cls}', ${i}, 1)">+</button>
+                </div>
+                <div class="icon-frame"><img src="icon/${m.icon}" onerror="this.src='https://via.placeholder.com/80?text=?'"></div>
+                <div class="monster-name">${m.name}</div>
+            </div>`;
+    });
+}
+
+function changeCount(cls, idx, val) {
+    const inputs = document.querySelectorAll('.' + cls);
+    let current = parseInt(inputs[idx].value) || 0;
+    inputs[idx].value = Math.max(0, current + val);
+    calculateAll();
+}
+
+function calculateAll() {
+    let total = 0;
+    const smallEnabled = document.getElementById('enable-small').checked;
+    document.querySelectorAll('.small-in').forEach(input => {
+        if(smallEnabled) total += (parseInt(input.value) || 0) * 5;
+    });
+    document.querySelectorAll('.large-in').forEach(input => {
+        total += (parseInt(input.value) || 0) * (parseInt(input.dataset.danger) * 100);
+    });
+    window.totalPoints = total;
+}
+
+function handleSmallToggle() {
+    document.getElementById('small-grid').classList.toggle('small-disabled', !document.getElementById('enable-small').checked);
+    calculateAll();
+}
+
+function toggleSection(id) { document.getElementById(id).classList.toggle('hidden'); }
+function playDrum() { const d = document.getElementById('se-drum'); d.currentTime = 0; d.play(); }
+function playCheer() { document.getElementById('se-cheer').play(); }
+function stopDrum() { const d = document.getElementById('se-drum'); d.pause(); d.currentTime = 0; }
+
+function reveal(id, idx) {
+    if (isConfirmed[id]) return;
+    const el = document.getElementById(id);
+    el.innerHTML = "0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9";
+    el.classList.add('is-spinning');
+    setTimeout(() => {
+        el.classList.remove('is-spinning');
+        isConfirmed[id] = true;
+        const valStr = window.totalPoints.toString().padStart(5, '0');
+        el.innerHTML = valStr[idx] || "0";
+        const remaining = Object.values(isConfirmed).filter(v => !v).length;
+        document.getElementById(remaining === 0 ? 'se-dodon' : 'se-don').cloneNode(true).play();
+    }, 1000);
+}
+
+function resetSlots() {
+    ['d10000', 'd1000', 'd100', 'd10', 'd1'].forEach(id => {
+        document.getElementById(id).innerHTML = "?";
+        isConfirmed[id] = false;
+    });
+    stopDrum();
+}
+
+init();
+</script>
+</body>
+</html>
