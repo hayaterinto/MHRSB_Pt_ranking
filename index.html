@@ -28,14 +28,12 @@
             border: 2px solid #ffffff;
             transition: 0.2s;
         }
-        .btn-calc-link:active { transform: scale(0.95); }
 
         /* タブ・ボタン共通 */
         .tabs, .sub-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; justify-content: center; }
         button { cursor: pointer; border: 2px solid #e67e22; border-radius: 5px; background: transparent; color: #e67e22; font-weight: bold; transition: 0.3s; padding: 6px 12px; font-size: 14px; }
         button.active { background: #e67e22; color: white; }
         
-        /* カテゴリ・条件選択 */
         .category-tabs .cat-btn { flex: 1; min-width: 100px; border: none; background: #34495e; color: #bdc3c7; }
         .category-tabs .cat-btn.active { background: #e74c3c; color: white; }
 
@@ -46,7 +44,6 @@
         .filter-area { background: #2c3e50; padding: 10px; text-align: center; border-radius: 5px; margin-bottom: 20px; font-size: 14px; }
         .filter-area label { margin: 0 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
 
-        /* タイトル表示 */
         #display-title { text-align: center; margin: 20px 0; }
         .current-cat-name { display: block; font-size: 1em; color: #bdc3c7; }
         .current-dept-name { display: block; font-size: 1.8em; color: #f39c12; font-weight: bold; }
@@ -54,7 +51,7 @@
 
         .mode-title { text-align: center; font-size: 1.5em; font-weight: bold; margin: 30px 0 10px 0; display: block; color: #fff; border-left: 5px solid #e67e22; border-right: 5px solid #e67e22; }
 
-        /* ★テーブル修正：プレイヤー名の幅と改行設定 */
+        /* ★テーブル修正：中央寄せ & 全太文字化 */
         .table-wrapper { overflow-x: hidden; margin-bottom: 30px; }
         table { 
             width: 100%; 
@@ -63,33 +60,33 @@
             color: #333; 
             border-radius: 5px; 
             overflow: hidden;
-            table-layout: fixed; /* 列幅を固定して制御 */
+            table-layout: fixed;
         }
         th, td { 
             padding: 10px 5px; 
             border: 1px solid #bdc3c7; 
             text-align: center; 
-            word-wrap: break-word; /* 長い名前を改行 */
+            word-wrap: break-word;
             overflow-wrap: break-word;
             font-size: 14px;
+            font-weight: bold; /* ★2位以下もすべて太文字に設定 */
         }
-        th { background: #34495e; color: white; font-weight: bold; }
+        th { background: #34495e; color: white; }
 
         /* 列幅の比率 */
-        th:nth-child(1), td:nth-child(1) { width: 55px; } /* 順位 */
-        th:nth-child(2), td:nth-child(2) { width: auto; text-align: left; padding-left: 10px; } /* プレイヤー名：可変 */
-        th:nth-child(3), td:nth-child(3) { width: 85px; } /* ポイント */
+        th:nth-child(1), td:nth-child(1) { width: 55px; } 
+        th:nth-child(2), td:nth-child(2) { width: auto; text-align: center; } /* ★名前を中央寄せに変更 */
+        th:nth-child(3), td:nth-child(3) { width: 85px; }
 
-        .rank-1 { background: #fff4d1; font-weight: bold; } 
+        /* 順位ごとの背景色 */
+        .rank-1 { background: #fff4d1; } 
         .rank-2 { background: #f0f0f0; } 
         .rank-3 { background: #ffebd1; }
 
-        /* スマホ向け調整 */
         @media screen and (max-width: 480px) {
             h1 { font-size: 1.4em; }
             .sub-title { font-size: 1.2em; }
             .current-dept-name { font-size: 1.5em; }
-            .btn-calc-link { font-size: 16px; padding: 10px 20px; }
             th, td { font-size: 13px; padding: 8px 4px; }
             th:nth-child(1), td:nth-child(1) { width: 45px; }
             th:nth-child(3), td:nth-child(3) { width: 75px; }
