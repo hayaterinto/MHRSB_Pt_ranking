@@ -5,66 +5,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>モンハンサンブレイクポイントランキング！</title>
     <style>
+        /* 基本設定 */
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #121212; color: #ecf0f1; padding: 10px; margin: 0; }
-        .container { max-width: 1000px; margin: 20px auto; background: #2c3e50; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
-        .header-area { text-align: center; margin-bottom: 30px; }
-        h1 { color: #f1c40f; font-size: 2em; margin: 0; text-shadow: 2px 2px 4px #000; }
-        .sub-title { color: #e67e22; font-size: 2em; font-weight: bold; display: block; margin-top: 10px; white-space: nowrap; }
+        .container { max-width: 1000px; margin: 20px auto; background: #2c3e50; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
         
+        /* ヘッダー・リンクボタン */
+        .header-area { text-align: center; margin-bottom: 20px; }
+        h1 { color: #f1c40f; font-size: 1.8em; margin: 0; text-shadow: 2px 2px 4px #000; }
+        .sub-title { color: #e67e22; font-size: 1.5em; font-weight: bold; display: block; margin-top: 5px; }
+        
+        .nav-link-area { text-align: center; margin-bottom: 20px; }
+        .btn-calc-link {
+            display: inline-block;
+            background-color: #ff8800; 
+            color: white; 
+            padding: 12px 24px; 
+            text-decoration: none; 
+            border-radius: 50px; 
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 4px 15px rgba(255, 136, 0, 0.4);
+            border: 2px solid #ffffff;
+            transition: 0.2s;
+        }
+        .btn-calc-link:active { transform: scale(0.95); }
+
         /* タブ・ボタン共通 */
-        .tabs, .sub-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; justify-content: center; }
-        button { cursor: pointer; border: 2px solid #e67e22; border-radius: 5px; background: transparent; color: #e67e22; font-weight: bold; transition: 0.3s; padding: 8px 15px; }
+        .tabs, .sub-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; justify-content: center; }
+        button { cursor: pointer; border: 2px solid #e67e22; border-radius: 5px; background: transparent; color: #e67e22; font-weight: bold; transition: 0.3s; padding: 6px 12px; font-size: 14px; }
         button.active { background: #e67e22; color: white; }
         
         /* カテゴリ・条件選択 */
-        .category-tabs .cat-btn { flex: 1; max-width: 200px; border: none; background: #34495e; color: #bdc3c7; }
+        .category-tabs .cat-btn { flex: 1; min-width: 100px; border: none; background: #34495e; color: #bdc3c7; }
         .category-tabs .cat-btn.active { background: #e74c3c; color: white; }
 
-        /* 条件選択エリア */
         .option-area { background: #34495e; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; border: 1px solid #444; }
         .option-group { margin: 10px 0; }
-        .option-label { display: block; font-size: 0.9em; color: #bdc3c7; margin-bottom: 5px; }
+        .option-label { display: block; font-size: 0.85em; color: #bdc3c7; margin-bottom: 5px; }
 
-        .filter-area { background: #2c3e50; padding: 10px; text-align: center; border-radius: 5px; }
-        .filter-area label { margin: 0 10px; font-weight: bold; cursor: pointer; }
+        .filter-area { background: #2c3e50; padding: 10px; text-align: center; border-radius: 5px; margin-bottom: 20px; font-size: 14px; }
+        .filter-area label { margin: 0 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
 
-        #display-title { text-align: center; margin: 30px 0; }
-        .current-cat-name { display: block; font-size: 1.2em; color: #bdc3c7; }
-        .current-dept-name { display: block; font-size: 2.2em; color: #f39c12; font-weight: bold; }
-        .current-options { color: #f1c40f; font-size: 1.1em; margin-top: 5px; }
+        /* タイトル表示 */
+        #display-title { text-align: center; margin: 20px 0; }
+        .current-cat-name { display: block; font-size: 1em; color: #bdc3c7; }
+        .current-dept-name { display: block; font-size: 1.8em; color: #f39c12; font-weight: bold; }
+        .current-options { color: #f1c40f; font-size: 1em; margin-top: 5px; }
 
-        .mode-title { text-align: center; font-size: 1.8em; font-weight: bold; margin: 40px 0 10px 0; display: block; color: #fff; border-left: 5px solid #e67e22; border-right: 5px solid #e67e22; }
-        .table-wrapper { overflow-x: auto; margin-bottom: 30px; }
-        table { width: 100%; border-collapse: collapse; background: #fff; color: #333; min-width: 600px; border-radius: 5px; overflow: hidden; }
-        th, td { padding: 12px; border: 1px solid #bdc3c7; text-align: center; }
-        th { background: #34495e; color: white; }
+        .mode-title { text-align: center; font-size: 1.5em; font-weight: bold; margin: 30px 0 10px 0; display: block; color: #fff; border-left: 5px solid #e67e22; border-right: 5px solid #e67e22; }
+
+        /* ★テーブル修正：プレイヤー名の幅と改行設定 */
+        .table-wrapper { overflow-x: hidden; margin-bottom: 30px; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background: #fff; 
+            color: #333; 
+            border-radius: 5px; 
+            overflow: hidden;
+            table-layout: fixed; /* 列幅を固定して制御 */
+        }
+        th, td { 
+            padding: 10px 5px; 
+            border: 1px solid #bdc3c7; 
+            text-align: center; 
+            word-wrap: break-word; /* 長い名前を改行 */
+            overflow-wrap: break-word;
+            font-size: 14px;
+        }
+        th { background: #34495e; color: white; font-weight: bold; }
+
+        /* 列幅の比率 */
+        th:nth-child(1), td:nth-child(1) { width: 55px; } /* 順位 */
+        th:nth-child(2), td:nth-child(2) { width: auto; text-align: left; padding-left: 10px; } /* プレイヤー名：可変 */
+        th:nth-child(3), td:nth-child(3) { width: 85px; } /* ポイント */
+
         .rank-1 { background: #fff4d1; font-weight: bold; } 
         .rank-2 { background: #f0f0f0; } 
         .rank-3 { background: #ffebd1; }
+
+        /* スマホ向け調整 */
+        @media screen and (max-width: 480px) {
+            h1 { font-size: 1.4em; }
+            .sub-title { font-size: 1.2em; }
+            .current-dept-name { font-size: 1.5em; }
+            .btn-calc-link { font-size: 16px; padding: 10px 20px; }
+            th, td { font-size: 13px; padding: 8px 4px; }
+            th:nth-child(1), td:nth-child(1) { width: 45px; }
+            th:nth-child(3), td:nth-child(3) { width: 75px; }
+        }
     </style>
 </head>
 <body>
 
-    
-<div style="text-align: center; margin: 20px 0;">
-    <a href="counter.html" style="
-        display: inline-block;
-        background-color: #ff8800; 
-        color: white; 
-        padding: 15px 30px; 
-        text-decoration: none; 
-        border-radius: 50px; 
-        font-weight: bold;
-        font-size: 20px;
-        box-shadow: 0 4px 15px rgba(255, 136, 0, 0.4);
-        border: 2px solid #ffffff;
-        transition: transform 0.2s;">
-        🔥 ポイント計算（スロット発表）はこちら
-    </a>
+<div class="nav-link-area">
+    <a href="counter.html" class="btn-calc-link">🔥 ポイント計算（スロット発表）はこちら</a>
+</div>
 
-    
-</div>
-</div>
 <div class="container">
     <div class="header-area">
         <h1>モンハンサンブレイクポイントランキング！</h1>
@@ -130,17 +167,15 @@ const setRankData = (playerList=[], pointList=[]) => {
     return { players, pts };
 };
 
-// ★全データ（ここを書き換えて更新）
+// ★ランキングデータ
 const rankingData = {
     general: {
         '1h': {
-            'upd-no_arena-no': { // アプデなし・闘技場なし
-                solo: setRankData(['チャトラ', '早矢りんと', 'フェンリル'], [920, 575, 475]),
+            'upd-no_arena-no': {
+                solo: setRankData(['チャトラ', '早矢りんと', 'フェンリル', 'すごく名前が長いハンターさんのサンプル'], [920, 575, 475, 100]),
                 tag:  setRankData(['チームα'], [1200])
             },
-            'upd-no_arena-yes': { // アプデなし・闘技場あり
-                solo: setRankData(['闘技場王'], [1500])
-            },
+            'upd-no_arena-yes': { solo: setRankData(['闘技場王'], [1500]) },
             'upd-yes_arena-no': { solo: setRankData(['アプデ勢A'], [2000]) },
             'upd-yes_arena-yes': { solo: setRankData(['最強ハンター'], [3000]) }
         },
@@ -151,25 +186,21 @@ const rankingData = {
     streamer_collab: { '1h': { 'upd-no_arena-no': { solo: setRankData(['協力者X'], [550]) } } }
 };
 
-// 現在の選択状態
 let state = { cat: 'general', dept: '1h', upd: 'no', arena: 'no' };
 
 function update(key, value) {
     state[key] = value;
-    
-    // ボタンの見た目更新
     const btnMap = { cat:'cat-btn', dept:'dept-btn', upd:'upd-btn', arena:'arena-btn' };
+    const labels = { general:'一般部門', streamer_only:'配信者限定', streamer_collab:'配信者枠協力', '1h':'1時間', '2h':'2時間', '3h':'3時間', no:'なし', yes:'あり' };
+    
     document.querySelectorAll('.' + btnMap[key]).forEach(b => {
         b.classList.remove('active');
-        const labels = { general:'一般部門', streamer_only:'配信者限定', streamer_collab:'配信者枠協力', '1h':'1時間', '2h':'2時間', '3h':'3時間', no:'なし', yes:'あり' };
         if(b.textContent === labels[value]) b.classList.add('active');
     });
-
     render();
 }
 
 function render() {
-    // テキスト更新
     const catNames = { general:'一般部門', streamer_only:'配信者限定', streamer_collab:'配信者枠協力' };
     document.getElementById('txt-cat').textContent = catNames[state.cat];
     document.getElementById('txt-dept').textContent = state.dept.replace('h', '時間部門');
@@ -178,14 +209,12 @@ function render() {
     const area = document.getElementById('ranking-area');
     area.innerHTML = '';
     
-    // フィルタ
     const activeModes = [];
     if(document.getElementById('f-solo').checked) activeModes.push('solo');
     if(document.getElementById('f-tag').checked) activeModes.push('tag');
     if(document.getElementById('f-trio').checked) activeModes.push('trio');
     if(document.getElementById('f-full').checked) activeModes.push('full');
 
-    // データ抽出
     const dataKey = `upd-${state.upd}_arena-${state.arena}`;
     const currentData = (rankingData[state.cat] && rankingData[state.cat][state.dept] && rankingData[state.cat][state.dept][dataKey]) 
                         ? rankingData[state.cat][state.dept][dataKey] : {};
@@ -194,7 +223,7 @@ function render() {
 
     modes.forEach(m => {
         if(activeModes.includes(m.id)) {
-            let html = `<span class="mode-title">${m.label}</span><div class="table-wrapper"><table><thead><tr><th width="15%">順位</th><th>プレイヤー名</th><th width="25%">ポイント</th></tr></thead><tbody>`;
+            let html = `<span class="mode-title">${m.label}</span><div class="table-wrapper"><table><thead><tr><th>順位</th><th>プレイヤー名</th><th>ポイント</th></tr></thead><tbody>`;
             const d = currentData[m.id] || setRankData();
             for(let i=0; i<10; i++) {
                 const rank = i+1;
@@ -206,7 +235,6 @@ function render() {
         }
     });
 }
-
 window.onload = render;
 </script>
 </body>
