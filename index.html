@@ -8,79 +8,36 @@
         /* 基本設定 */
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #121212; color: #ecf0f1; padding: 10px; margin: 0; }
         .container { max-width: 1000px; margin: 20px auto; background: #2c3e50; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
-        
-        /* ヘッダー・リンクボタン */
         .header-area { text-align: center; margin-bottom: 20px; }
         h1 { color: #f1c40f; font-size: 1.8em; margin: 0; text-shadow: 2px 2px 4px #000; }
         .sub-title { color: #e67e22; font-size: 1.5em; font-weight: bold; display: block; margin-top: 5px; }
-        
         .nav-link-area { text-align: center; margin-bottom: 20px; }
-        .btn-calc-link {
-            display: inline-block;
-            background-color: #ff8800; 
-            color: white; 
-            padding: 12px 24px; 
-            text-decoration: none; 
-            border-radius: 50px; 
-            font-weight: bold;
-            font-size: 18px;
-            box-shadow: 0 4px 15px rgba(255, 136, 0, 0.4);
-            border: 2px solid #ffffff;
-            transition: 0.2s;
-        }
-
-        /* タブ・ボタン共通 */
+        .btn-calc-link { display: inline-block; background-color: #ff8800; color: white; padding: 12px 24px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 15px rgba(255, 136, 0, 0.4); border: 2px solid #ffffff; transition: 0.2s; }
         .tabs, .sub-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; justify-content: center; }
         button { cursor: pointer; border: 2px solid #e67e22; border-radius: 5px; background: transparent; color: #e67e22; font-weight: bold; transition: 0.3s; padding: 6px 12px; font-size: 14px; }
         button.active { background: #e67e22; color: white; }
-        
         .category-tabs .cat-btn { flex: 1; min-width: 100px; border: none; background: #34495e; color: #bdc3c7; }
         .category-tabs .cat-btn.active { background: #e74c3c; color: white; }
-
         .option-area { background: #34495e; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; border: 1px solid #444; }
         .option-group { margin: 10px 0; }
         .option-label { display: block; font-size: 0.85em; color: #bdc3c7; margin-bottom: 5px; }
-
         .filter-area { background: #2c3e50; padding: 10px; text-align: center; border-radius: 5px; margin-bottom: 20px; font-size: 14px; }
         .filter-area label { margin: 0 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
-
         #display-title { text-align: center; margin: 20px 0; }
         .current-cat-name { display: block; font-size: 1em; color: #bdc3c7; }
         .current-dept-name { display: block; font-size: 1.8em; color: #f39c12; font-weight: bold; }
         .current-options { color: #f1c40f; font-size: 1em; margin-top: 5px; }
-
         .mode-title { text-align: center; font-size: 1.5em; font-weight: bold; margin: 30px 0 10px 0; display: block; color: #fff; border-left: 5px solid #e67e22; border-right: 5px solid #e67e22; }
-
-        /* テーブル設定：中央寄せ & 全太文字 */
         .table-wrapper { overflow-x: hidden; margin-bottom: 30px; }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            background: #fff; 
-            color: #333; 
-            border-radius: 5px; 
-            overflow: hidden;
-            table-layout: fixed;
-        }
-        th, td { 
-            padding: 10px 5px; 
-            border: 1px solid #bdc3c7; 
-            text-align: center; 
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            font-size: 14px;
-            font-weight: bold;
-        }
+        table { width: 100%; border-collapse: collapse; background: #fff; color: #333; border-radius: 5px; overflow: hidden; table-layout: fixed; }
+        th, td { padding: 10px 5px; border: 1px solid #bdc3c7; text-align: center; word-wrap: break-word; overflow-wrap: break-word; font-size: 14px; font-weight: bold; }
         th { background: #34495e; color: white; }
-
         th:nth-child(1), td:nth-child(1) { width: 55px; } 
         th:nth-child(2), td:nth-child(2) { width: auto; text-align: center; }
         th:nth-child(3), td:nth-child(3) { width: 85px; }
-
         .rank-1 { background: #fff4d1; } 
         .rank-2 { background: #f0f0f0; } 
         .rank-3 { background: #ffebd1; }
-
         @media screen and (max-width: 480px) {
             h1 { font-size: 1.4em; }
             .sub-title { font-size: 1.2em; }
@@ -153,7 +110,7 @@
 </div>
 
 <script>
-// データ作成用関数（10位まで枠を作ります）
+// --- 基本関数 ---
 const setRankData = (playerList=[], pointList=[]) => {
     const players = Array(10).fill('---');
     const pts = Array(10).fill(0);
@@ -162,61 +119,50 @@ const setRankData = (playerList=[], pointList=[]) => {
     return { players, pts };
 };
 
-/* ================================================================
-  ★ランキングデータの編集ガイド
-  ================================================================
-  1. 「'1h'」などの時間部門を探す。
-  2. 「'upd-no_arena-no'」などの条件を探す。
-     - upd-no = アプデなし / upd-yes = アプデあり
-     - arena-no = 闘技場なし / arena-yes = 闘技場あり
-  3. setRankData(['名前1', '名前2', '名前3'], [点数1, 点数2, 点数3]) の形式で書き換える。
-  ================================================================
-*/
+const defPts = [300, 200, 100];
+const getEmptyModeSet = (label) => ({
+    solo: setRankData([`${label}ソロ1`, `${label}ソロ2`, `${label}ソロ3`], defPts),
+    tag:  setRankData([`${label}タッグ1`, `${label}タッグ2`, `${label}タッグ3`], defPts),
+    trio: setRankData([`${label}トリオ1`, `${label}トリオ2`, `${label}トリオ3`], defPts),
+    full: setRankData([`${label}フルパ1`, `${label}フルパ2`, `${label}フルパ3`], defPts)
+});
+
+// --- ランキングデータ本体 ---
 const rankingData = {
     general: {
         '1h': {
             'upd-no_arena-no': {
-                solo: setRankData(['チャトラ', '早矢りんと', 'フェンリル'], [920, 575, 475]),
-                tag:  setRankData(['チームα', 'チームβ', 'チームγ'], [1200, 1100, 900])
+                solo: setRankData(['チャトラ', '早矢りんと', 'フェンリル'], [920, 575, 475]), // 元データを維持
+                tag:  setRankData(['1hタッグA', '1hタッグB', '1hタッグC'], defPts),
+                trio: setRankData(['1hトリオA', '1hトリオB', '1hトリオC'], defPts),
+                full: setRankData(['1hフルパA', '1hフルパB', '1hフルパC'], defPts)
             },
-            'upd-no_arena-yes': {
-                solo: setRankData(['闘技場王', 'ハンターB', 'ハンターC'], [1500, 1400, 1300])
-            },
-            'upd-yes_arena-no': {
-                solo: setRankData(['アプデ勢A', 'アプデ勢B', 'アプデ勢C'], [2000, 1800, 1600])
-            },
-            'upd-yes_arena-yes': {
-                solo: setRankData(['最強ハンター', '二番手', '三番手'], [3000, 2500, 2000])
-            }
+            'upd-no_arena-yes': getEmptyModeSet('1h闘'),
+            'upd-yes_arena-no': getEmptyModeSet('1hア'),
+            'upd-yes_arena-yes':getEmptyModeSet('1h極')
         },
-        '1.5h': { // 90分部門
-            'upd-no_arena-no': {
-                solo: setRankData(['90分ソロ1', '90分ソロ2', '90分ソロ3'], [1200, 1100, 1000]),
-                tag:  setRankData(['90分タッグ1', '2', '3'], [1500, 1300, 1100])
-            },
-            'upd-no_arena-yes': { solo: setRankData(['闘技場90A', 'B', 'C'], [1800, 1600, 1400]) },
-            'upd-yes_arena-no': { solo: setRankData(['アプデ90A', 'B', 'C'], [2500, 2200, 1900]) },
-            'upd-yes_arena-yes': { solo: setRankData(['究極90A', 'B', 'C'], [3500, 3000, 2500]) }
+        '1.5h': {
+            'upd-no_arena-no':  getEmptyModeSet('90分通'),
+            'upd-no_arena-yes': getEmptyModeSet('90分闘'),
+            'upd-yes_arena-no': getEmptyModeSet('90分ア'),
+            'upd-yes_arena-yes':getEmptyModeSet('90分極')
         },
-        '2h': { // 120分部門
-            'upd-no_arena-no': {
-                solo: setRankData(['120分ソロ1', '2', '3'], [1800, 1600, 1400]),
-                tag:  setRankData(['120分タッグ1', '2', '3'], [2200, 2000, 1800])
-            },
-            'upd-no_arena-yes': { solo: setRankData(['闘技120A', 'B', 'C'], [2500, 2300, 2100]) },
-            'upd-yes_arena-no': { solo: setRankData(['アプデ120A', 'B', 'C'], [3200, 2900, 2600]) },
-            'upd-yes_arena-yes': { solo: setRankData(['極限120A', 'B', 'C'], [4500, 4000, 3500]) }
+        '2h': {
+            'upd-no_arena-no':  getEmptyModeSet('120分通'),
+            'upd-no_arena-yes': getEmptyModeSet('120分闘'),
+            'upd-yes_arena-no': getEmptyModeSet('120分ア'),
+            'upd-yes_arena-yes':getEmptyModeSet('120分極')
         }
     },
     streamer_only: { 
-        '1h': { 'upd-no_arena-no': { solo: setRankData(['配信者A', 'B', 'C'], [500, 400, 300]) } },
-        '1.5h': { 'upd-no_arena-no': { solo: setRankData(['配信者D', 'E', 'F'], [700, 600, 500]) } },
-        '2h': { 'upd-no_arena-no': { solo: setRankData(['配信者G', 'H', 'I'], [900, 800, 700]) } }
+        '1h': { 'upd-no_arena-no': getEmptyModeSet('配信1h') },
+        '1.5h': { 'upd-no_arena-no': getEmptyModeSet('配信90') },
+        '2h': { 'upd-no_arena-no': getEmptyModeSet('配信120') }
     },
     streamer_collab: { 
-        '1h': { 'upd-no_arena-no': { solo: setRankData(['協力者X', 'Y', 'Z'], [550, 450, 350]) } },
-        '1.5h': { 'upd-no_arena-no': { solo: setRankData(['協力者A', 'B', 'C'], [750, 650, 550]) } },
-        '2h': { 'upd-no_arena-no': { solo: setRankData(['協力者D', 'E', 'F'], [950, 850, 750]) } }
+        '1h': { 'upd-no_arena-no': getEmptyModeSet('協力1h') },
+        '1.5h': { 'upd-no_arena-no': getEmptyModeSet('協力90') },
+        '2h': { 'upd-no_arena-no': getEmptyModeSet('協力120') }
     }
 };
 
@@ -225,14 +171,7 @@ let state = { cat: 'general', dept: '1h', upd: 'no', arena: 'no' };
 function update(key, value) {
     state[key] = value;
     const btnMap = { cat:'cat-btn', dept:'dept-btn', upd:'upd-btn', arena:'arena-btn' };
-    
-    // ボタン表示名と連動させるためのマッピング
-    const labelMap = { 
-        general:'一般部門', streamer_only:'配信者限定', streamer_collab:'配信者枠協力', 
-        '1h':'1時間', '1.5h':'90分', '2h':'120分', 
-        no:'なし', yes:'あり' 
-    };
-    
+    const labelMap = { general:'一般部門', streamer_only:'配信者限定', streamer_collab:'配信者枠協力', '1h':'1時間', '1.5h':'90分', '2h':'120分', no:'なし', yes:'あり' };
     document.querySelectorAll('.' + btnMap[key]).forEach(b => {
         b.classList.remove('active');
         if(b.textContent === labelMap[value]) b.classList.add('active');
@@ -243,26 +182,19 @@ function update(key, value) {
 function render() {
     const catNames = { general:'一般部門', streamer_only:'配信者限定', streamer_collab:'配信者枠協力' };
     const deptNames = { '1h':'1時間部門', '1.5h':'90分部門', '2h':'120分部門' };
-
     document.getElementById('txt-cat').textContent = catNames[state.cat];
     document.getElementById('txt-dept').textContent = deptNames[state.dept];
     document.getElementById('txt-opts').textContent = `アプデ${state.upd === 'yes' ? 'あり' : 'なし'} / 闘技場${state.arena === 'yes' ? 'あり' : 'なし'}`;
-
     const area = document.getElementById('ranking-area');
     area.innerHTML = '';
-    
     const activeModes = [];
     if(document.getElementById('f-solo').checked) activeModes.push('solo');
     if(document.getElementById('f-tag').checked) activeModes.push('tag');
     if(document.getElementById('f-trio').checked) activeModes.push('trio');
     if(document.getElementById('f-full').checked) activeModes.push('full');
-
     const dataKey = `upd-${state.upd}_arena-${state.arena}`;
-    const currentData = (rankingData[state.cat] && rankingData[state.cat][state.dept] && rankingData[state.cat][state.dept][dataKey]) 
-                        ? rankingData[state.cat][state.dept][dataKey] : {};
-
+    const currentData = (rankingData[state.cat] && rankingData[state.cat][state.dept] && rankingData[state.cat][state.dept][dataKey]) ? rankingData[state.cat][state.dept][dataKey] : {};
     const modes = [{id:'solo', label:'ソロ（1人）'}, {id:'tag', label:'タッグ（2人）'}, {id:'trio', label:'トリオ（3人）'}, {id:'full', label:'フルパ（4人）'}];
-
     modes.forEach(m => {
         if(activeModes.includes(m.id)) {
             let html = `<span class="mode-title">${m.label}</span><div class="table-wrapper"><table><thead><tr><th>順位</th><th>プレイヤー名</th><th>ポイント</th></tr></thead><tbody>`;
