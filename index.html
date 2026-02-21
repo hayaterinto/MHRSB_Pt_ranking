@@ -11,6 +11,19 @@
         .header-area { text-align: center; margin-bottom: 20px; }
         h1 { color: #f1c40f; font-size: 1.8em; margin: 0; text-shadow: 2px 2px 4px #000; }
         .sub-title { color: #e67e22; font-size: 1.5em; font-weight: bold; display: block; margin-top: 5px; }
+
+        /* ルールエリア（トグル） */
+        .rule-container { background: #34495e; border: 2px solid #e67e22; border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+        .rule-header { background: #e67e22; color: white; padding: 10px; cursor: pointer; font-weight: bold; text-align: center; display: flex; justify-content: center; align-items: center; }
+        .rule-header::after { content: '▲'; margin-left: 10px; transition: 0.3s; }
+        .rule-container.closed .rule-header::after { content: '▼'; transform: rotate(180deg); }
+        .rule-content { padding: 15px; line-height: 1.6; transition: max-height 0.3s ease-out; max-height: 500px; }
+        .rule-container.closed .rule-content { max-height: 0; padding: 0; visibility: hidden; }
+        .rule-list { list-style: none; padding: 0; margin: 0; }
+        .rule-list li { margin-bottom: 8px; padding-left: 1.5em; position: relative; }
+        .rule-list li::before { content: '◈'; position: absolute; left: 0; color: #f1c40f; }
+        .point-badge { background: #e74c3c; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+
         .nav-link-area { text-align: center; margin-bottom: 20px; }
         .btn-calc-link { display: inline-block; background-color: #ff8800; color: white; padding: 12px 24px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 15px rgba(255, 136, 0, 0.4); border: 2px solid #ffffff; transition: 0.2s; }
         .tabs, .sub-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; justify-content: center; }
@@ -28,23 +41,29 @@
         .current-dept-name { display: block; font-size: 1.8em; color: #f39c12; font-weight: bold; }
         .current-options { color: #f1c40f; font-size: 1em; margin-top: 5px; }
         .mode-title { text-align: center; font-size: 1.5em; font-weight: bold; margin: 30px 0 10px 0; display: block; color: #fff; border-left: 5px solid #e67e22; border-right: 5px solid #e67e22; }
+        
         .table-wrapper { overflow-x: hidden; margin-bottom: 30px; }
         table { width: 100%; border-collapse: collapse; background: #fff; color: #333; border-radius: 5px; overflow: hidden; table-layout: fixed; }
-        th, td { padding: 10px 5px; border: 1px solid #bdc3c7; text-align: center; word-wrap: break-word; overflow-wrap: break-word; font-size: 14px; font-weight: bold; }
+        th, td { padding: 10px 5px; border: 1px solid #bdc3c7; text-align: center; font-size: 14px; font-weight: bold; word-break: break-all; }
         th { background: #34495e; color: white; }
-        th:nth-child(1), td:nth-child(1) { width: 55px; } 
-        th:nth-child(2), td:nth-child(2) { width: auto; text-align: center; }
-        th:nth-child(3), td:nth-child(3) { width: 85px; }
+        .rank-col { width: 60px; }
+        .pts-col { width: 90px; }
+        
+        .member-row { display: flex; border-bottom: 1px solid #eee; padding: 4px 0; align-items: center; }
+        .member-row:last-child { border-bottom: none; }
+        .m-name { flex: 1; text-align: center; border-right: 1px solid #eee; }
+        .m-wep { flex: 1; text-align: center; color: #555; font-size: 0.9em; }
+        
         .rank-1 { background: #fff4d1; } 
         .rank-2 { background: #f0f0f0; } 
         .rank-3 { background: #ffebd1; }
+
         @media screen and (max-width: 480px) {
             h1 { font-size: 1.4em; }
             .sub-title { font-size: 1.2em; }
-            .current-dept-name { font-size: 1.5em; }
-            th, td { font-size: 13px; padding: 8px 4px; }
-            th:nth-child(1), td:nth-child(1) { width: 45px; }
-            th:nth-child(3), td:nth-child(3) { width: 75px; }
+            th, td { font-size: 12px; padding: 5px 2px; }
+            .rank-col { width: 45px; }
+            .pts-col { width: 70px; }
         }
     </style>
 </head>
@@ -58,6 +77,18 @@
     <div class="header-area">
         <h1>モンハンサンブレイクポイントランキング！</h1>
         <span class="sub-title">早矢りんと杯</span>
+    </div>
+
+    <div class="rule-container" id="ruleBox">
+        <div class="rule-header" onclick="toggleRules()">🏆 ポイントランキング ルール（クリックで開閉）</div>
+        <div class="rule-content">
+            <ul class="rule-list">
+                <li><strong>大型モンスター：</strong> 危険度 × <span class="point-badge">100 pt</span></li>
+                <li><strong>小型モンスター：</strong> 1体につき <span class="point-badge">5 pt</span></li>
+                <li><strong>禁止事項：</strong> <span style="color: #e74c3c; font-weight: bold;">闘技場クエストの使用は禁止</span> とします。</li>
+                <li><strong>計測：</strong> 決められた制限時間内での合計獲得ポイントを競います。</li>
+            </ul>
+        </div>
     </div>
 
     <div class="category-tabs tabs">
@@ -75,20 +106,11 @@
                 <button class="dept-btn" onclick="update('dept', '2h')">120分</button>
             </div>
         </div>
-        <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
-            <div class="option-group">
-                <span class="option-label">【アプデ武器防具】</span>
-                <div class="sub-tabs">
-                    <button class="upd-btn active" onclick="update('upd', 'no')">なし</button>
-                    <button class="upd-btn" onclick="update('upd', 'yes')">あり</button>
-                </div>
-            </div>
-            <div class="option-group">
-                <span class="option-label">【闘技場クエスト】</span>
-                <div class="sub-tabs">
-                    <button class="arena-btn active" onclick="update('arena', 'no')">なし</button>
-                    <button class="arena-btn" onclick="update('arena', 'yes')">あり</button>
-                </div>
+        <div class="option-group">
+            <span class="option-label">【アプデ武器防具】</span>
+            <div class="sub-tabs">
+                <button class="upd-btn active" onclick="update('upd', 'no')">なし</button>
+                <button class="upd-btn" onclick="update('upd', 'yes')">あり</button>
             </div>
         </div>
     </div>
@@ -103,79 +125,82 @@
     <div id="display-title">
         <span id="txt-cat" class="current-cat-name">一般部門</span>
         <span id="txt-dept" class="current-dept-name">1時間部門</span>
-        <div id="txt-opts" class="current-options">アプデなし / 闘技場なし</div>
+        <div id="txt-opts" class="current-options">アプデなし</div>
     </div>
 
     <div id="ranking-area"></div>
 </div>
 
 <script>
-// --- 基本関数 ---
-const setRankData = (playerList=[], pointList=[]) => {
-    const players = Array(10).fill('---');
-    const pts = Array(10).fill(0);
-    playerList.forEach((name, i) => { if(i < 10) players[i] = name; });
-    pointList.forEach((pt, i) => { if(i < 10) pts[i] = pt; });
-    return { players, pts };
+function toggleRules() {
+    document.getElementById('ruleBox').classList.toggle('closed');
+}
+
+const setRankData = (playerGroupList=[], pointList=[]) => {
+    const data = Array(10).fill(null).map(() => ({ players: [], pts: 0 }));
+    pointList.forEach((pt, i) => { if(i < 10) data[i].pts = pt; });
+    playerGroupList.forEach((group, i) => { if(i < 10) data[i].players = group; });
+    return data;
 };
 
-const defPts = [300, 200, 100];
-const getEmptyModeSet = (label) => ({
-    solo: setRankData([`${label}ソロ1`, `${label}ソロ2`, `${label}ソロ3`], defPts),
-    tag:  setRankData([`${label}タッグ1`, `${label}タッグ2`, `${label}タッグ3`], defPts),
-    trio: setRankData([`${label}トリオ1`, `${label}トリオ2`, `${label}トリオ3`], defPts),
-    full: setRankData([`${label}フルパ1`, `${label}フルパ2`, `${label}フルパ3`], defPts)
-});
+const getEmptyModeSet = (label) => {
+    const sample = (prefix, n) => {
+        const group = [];
+        for(let i=0; i<n; i++) group.push([`${prefix}ハンター${i+1}`, '武器種']);
+        return group;
+    };
+    return {
+        solo: setRankData([[sample(`${label}ソロ`, 1)[0]], [sample(`${label}ソロ`, 1)[0]], [sample(`${label}ソロ`, 1)[0]]], [300, 200, 100]),
+        tag:  setRankData([sample(`${label}タッグ`, 2), sample(`${label}タッグ`, 2), sample(`${label}タッグ`, 2)], [600, 400, 200]),
+        trio: setRankData([sample(`${label}トリオ`, 3), sample(`${label}トリオ`, 3), sample(`${label}トリオ`, 3)], [900, 600, 300]),
+        full: setRankData([sample(`${label}フルパ`, 4), sample(`${label}フルパ`, 4), sample(`${label}フルパ`, 4)], [1200, 800, 400])
+    };
+};
 
-// --- ランキングデータ本体 ---
 const rankingData = {
     general: {
         '1h': {
-            'upd-no_arena-no': {
-                solo: setRankData(['チャト', '早矢りんと', 'フェンリル'], [920, 575, 475]), // 元データを維持
-                tag:  setRankData(['1hタッグA', '1hタッグB', '1hタッグC'], defPts),
-                trio: setRankData(['1hトリオA', '1hトリオB', '1hトリオC'], defPts),
-                full: setRankData(['1hフルパA', '1hフルパB', '1hフルパC'], defPts)
+            'upd-no': {
+                solo: setRankData([[['チャトラ', '太刀']], [['早矢りんと', '太刀']], [['フェンリル', '双剣']]], [920, 575, 475]),
+                tag:  getEmptyModeSet('1h通').tag,
+                trio: getEmptyModeSet('1h通').trio,
+                full: getEmptyModeSet('1h通').full
             },
-            'upd-no_arena-yes': getEmptyModeSet('1h闘'),
-            'upd-yes_arena-no': getEmptyModeSet('1hア'),
-            'upd-yes_arena-yes':getEmptyModeSet('1h極')
+            'upd-yes': getEmptyModeSet('1hア')
         },
         '1.5h': {
-            'upd-no_arena-no':  getEmptyModeSet('90分通'),
-            'upd-no_arena-yes': getEmptyModeSet('90分闘'),
-            'upd-yes_arena-no': getEmptyModeSet('90分ア'),
-            'upd-yes_arena-yes':getEmptyModeSet('90分極')
+            'upd-no': getEmptyModeSet('90分'),
+            'upd-yes': getEmptyModeSet('90分ア')
         },
         '2h': {
-            'upd-no_arena-no':  getEmptyModeSet('120分通'),
-            'upd-no_arena-yes': getEmptyModeSet('120分闘'),
-            'upd-yes_arena-no': getEmptyModeSet('120分ア'),
-            'upd-yes_arena-yes':getEmptyModeSet('120分極')
+            'upd-no': getEmptyModeSet('120分'),
+            'upd-yes': getEmptyModeSet('120分ア')
         }
     },
     streamer_only: { 
-        '1h': { 'upd-no_arena-no': getEmptyModeSet('配信1h') },
-        '1.5h': { 'upd-no_arena-no': getEmptyModeSet('配信90') },
-        '2h': { 'upd-no_arena-no': getEmptyModeSet('配信120') }
+        '1h': { 
+            'upd-no': {
+                solo: setRankData([[['早矢りんと', '太刀']], [['星藍こーちゃ', 'ランス']]], [1150, 675]),
+                tag:  getEmptyModeSet('配信1h').tag,
+                trio: getEmptyModeSet('配信1h').trio,
+                full: getEmptyModeSet('配信1h').full
+            },
+            'upd-yes': getEmptyModeSet('配信1hア')
+        },
+        '1.5h': { 'upd-no': getEmptyModeSet('配信90'), 'upd-yes': getEmptyModeSet('配信90ア') },
+        '2h': { 'upd-no': getEmptyModeSet('配信120'), 'upd-yes': getEmptyModeSet('配信120ア') }
     },
     streamer_collab: { 
-        '1h': { 'upd-no_arena-no': getEmptyModeSet('協力1h') },
-        '1.5h': { 'upd-no_arena-no': getEmptyModeSet('協力90') },
-        '2h': { 'upd-no_arena-no': getEmptyModeSet('協力120') }
+        '1h': { 'upd-no': getEmptyModeSet('協力1h'), 'upd-yes': getEmptyModeSet('協力1hア') },
+        '1.5h': { 'upd-no': getEmptyModeSet('協力90'), 'upd-yes': getEmptyModeSet('協力90ア') },
+        '2h': { 'upd-no': getEmptyModeSet('協力120'), 'upd-yes': getEmptyModeSet('協力120ア') }
     }
 };
 
-let state = { cat: 'general', dept: '1h', upd: 'no', arena: 'no' };
+let state = { cat: 'general', dept: '1h', upd: 'no' };
 
 function update(key, value) {
     state[key] = value;
-    const btnMap = { cat:'cat-btn', dept:'dept-btn', upd:'upd-btn', arena:'arena-btn' };
-    const labelMap = { general:'一般部門', streamer_only:'配信者限定', streamer_collab:'配信者枠協力', '1h':'1時間', '1.5h':'90分', '2h':'120分', no:'なし', yes:'あり' };
-    document.querySelectorAll('.' + btnMap[key]).forEach(b => {
-        b.classList.remove('active');
-        if(b.textContent === labelMap[value]) b.classList.add('active');
-    });
     render();
 }
 
@@ -184,29 +209,39 @@ function render() {
     const deptNames = { '1h':'1時間部門', '1.5h':'90分部門', '2h':'120分部門' };
     document.getElementById('txt-cat').textContent = catNames[state.cat];
     document.getElementById('txt-dept').textContent = deptNames[state.dept];
-    document.getElementById('txt-opts').textContent = `アプデ${state.upd === 'yes' ? 'あり' : 'なし'} / 闘技場${state.arena === 'yes' ? 'あり' : 'なし'}`;
+    document.getElementById('txt-opts').textContent = `アプデ${state.upd === 'yes' ? 'あり' : 'なし'}`;
+    
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(state.cat)));
+    document.querySelectorAll('.dept-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(state.dept)));
+    document.querySelectorAll('.upd-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(state.upd)));
+
     const area = document.getElementById('ranking-area');
     area.innerHTML = '';
-    const activeModes = [];
-    if(document.getElementById('f-solo').checked) activeModes.push('solo');
-    if(document.getElementById('f-tag').checked) activeModes.push('tag');
-    if(document.getElementById('f-trio').checked) activeModes.push('trio');
-    if(document.getElementById('f-full').checked) activeModes.push('full');
-    const dataKey = `upd-${state.upd}_arena-${state.arena}`;
-    const currentData = (rankingData[state.cat] && rankingData[state.cat][state.dept] && rankingData[state.cat][state.dept][dataKey]) ? rankingData[state.cat][state.dept][dataKey] : {};
     const modes = [{id:'solo', label:'ソロ（1人）'}, {id:'tag', label:'タッグ（2人）'}, {id:'trio', label:'トリオ（3人）'}, {id:'full', label:'フルパ（4人）'}];
+    
+    const dataKey = `upd-${state.upd}`;
+    const currentDataRoot = (rankingData[state.cat] && rankingData[state.cat][state.dept]) ? rankingData[state.cat][state.dept][dataKey] || getEmptyModeSet('空') : getEmptyModeSet('空');
+
     modes.forEach(m => {
-        if(activeModes.includes(m.id)) {
-            let html = `<span class="mode-title">${m.label}</span><div class="table-wrapper"><table><thead><tr><th>順位</th><th>プレイヤー名</th><th>ポイント</th></tr></thead><tbody>`;
-            const d = currentData[m.id] || setRankData();
-            for(let i=0; i<10; i++) {
-                const rank = i+1;
-                const cls = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'';
-                html += `<tr class="${cls}"><td>${rank}位</td><td>${d.players[i]}</td><td>${d.pts[i] ? d.pts[i].toLocaleString() + ' pt' : '---'}</td></tr>`;
+        if(!document.getElementById('f-' + m.id).checked) return;
+        let html = `<span class="mode-title">${m.label}</span><div class="table-wrapper"><table><thead><tr><th class="rank-col">順位</th><th>メンバー (名前 / 武器種)</th><th class="pts-col">ポイント</th></tr></thead><tbody>`;
+        const d = currentDataRoot[m.id] || [];
+        for(let i=0; i<10; i++) {
+            const row = d[i] || { players: [], pts: 0 };
+            const rank = i+1;
+            const cls = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'';
+            html += `<tr class="${cls}"><td>${rank}位</td><td>`;
+            if(row.players.length === 0) {
+                html += `<div class="member-row"><div class="m-name">---</div><div class="m-wep">---</div></div>`;
+            } else {
+                row.players.forEach(p => {
+                    html += `<div class="member-row"><div class="m-name">${p[0]}</div><div class="m-wep">${p[1]}</div></div>`;
+                });
             }
-            html += `</tbody></table></div>`;
-            area.innerHTML += html;
+            html += `</td><td>${row.pts > 0 ? row.pts.toLocaleString() + ' pt' : '---'}</td></tr>`;
         }
+        html += `</tbody></table></div>`;
+        area.innerHTML += html;
     });
 }
 window.onload = render;
