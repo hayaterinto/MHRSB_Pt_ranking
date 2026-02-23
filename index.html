@@ -17,7 +17,7 @@
         .rule-header { background: #e67e22; color: white; padding: 10px; cursor: pointer; font-weight: bold; text-align: center; display: flex; justify-content: center; align-items: center; }
         .rule-header::after { content: '▲'; margin-left: 10px; transition: 0.3s; }
         .rule-container.closed .rule-header::after { content: '▼'; transform: rotate(180deg); }
-        .rule-content { padding: 15px; line-height: 1.6; transition: max-height 0.3s ease-out; max-height: 500px; }
+        .rule-content { padding: 15px; line-height: 1.6; transition: max-height 0.3s ease-out; max-height: 600px; }
         .rule-container.closed .rule-content { max-height: 0; padding: 0; visibility: hidden; }
         .rule-list { list-style: none; padding: 0; margin: 0; }
         .rule-list li { margin-bottom: 8px; padding-left: 1.5em; position: relative; }
@@ -36,6 +36,7 @@
         .option-label { display: block; font-size: 0.85em; color: #bdc3c7; margin-bottom: 5px; }
         .filter-area { background: #2c3e50; padding: 10px; text-align: center; border-radius: 5px; margin-bottom: 20px; font-size: 14px; }
         .filter-area label { margin: 0 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+        .filter-area label.hidden { display: none; }
         #display-title { text-align: center; margin: 20px 0; }
         .current-cat-name { display: block; font-size: 1em; color: #bdc3c7; }
         .current-dept-name { display: block; font-size: 1.8em; color: #f39c12; font-weight: bold; }
@@ -88,6 +89,8 @@
                 <li><strong>計測：</strong> 決められた制限時間内での合計獲得ポイントを競います。</li>
                 <li><strong>禁止事項：</strong> <span style="color: #e74c3c; font-weight: bold;">闘技場クエストの使用は禁止</span> とします。</li>
                 <li><strong>アプデ防具とは：</strong> 里守武器、ギルドクロス、クロオビ装備が使用可能かどうかでランキング分けしています。</li>
+                <li><strong>イベントクエスト：</strong> イベントクエストの利用有無でランキングを分けています。</li>
+                <li><strong>配信者枠協力：</strong> 配信者とリスナーがチームで挑む部門のため、ソロ枠はありません。</li>
             </ul>
         </div>
     </div>
@@ -107,26 +110,35 @@
                 <button class="dept-btn" onclick="update('dept', '2h')">120分</button>
             </div>
         </div>
-        <div class="option-group">
-            <span class="option-label">【アプデ武器防具】</span>
-            <div class="sub-tabs">
-                <button class="upd-btn active" onclick="update('upd', 'no')">なし</button>
-                <button class="upd-btn" onclick="update('upd', 'yes')">あり</button>
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+            <div class="option-group">
+                <span class="option-label">【アプデ武器防具】</span>
+                <div class="sub-tabs">
+                    <button class="upd-btn active" onclick="update('upd', 'no')">なし</button>
+                    <button class="upd-btn" onclick="update('upd', 'yes')">あり</button>
+                </div>
+            </div>
+            <div class="option-group">
+                <span class="option-label">【イベントクエスト】</span>
+                <div class="sub-tabs">
+                    <button class="event-btn active" onclick="update('event', 'no')">なし</button>
+                    <button class="event-btn" onclick="update('event', 'yes')">あり</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="filter-area">
-        <label><input type="checkbox" checked onchange="render()" id="f-solo"> ソロ</label>
-        <label><input type="checkbox" checked onchange="render()" id="f-tag"> タッグ</label>
-        <label><input type="checkbox" checked onchange="render()" id="f-trio"> トリオ</label>
-        <label><input type="checkbox" checked onchange="render()" id="f-full"> フルパ</label>
+        <label id="label-solo"><input type="checkbox" checked onchange="render()" id="f-solo"> ソロ</label>
+        <label id="label-tag"><input type="checkbox" checked onchange="render()" id="f-tag"> タッグ</label>
+        <label id="label-trio"><input type="checkbox" checked onchange="render()" id="f-trio"> トリオ</label>
+        <label id="label-full"><input type="checkbox" checked onchange="render()" id="f-full"> フルパ</label>
     </div>
 
     <div id="display-title">
         <span id="txt-cat" class="current-cat-name">一般部門</span>
         <span id="txt-dept" class="current-dept-name">1時間部門</span>
-        <div id="txt-opts" class="current-options">アプデなし</div>
+        <div id="txt-opts" class="current-options">アプデなし / イベクエなし</div>
     </div>
 
     <div id="ranking-area"></div>
@@ -144,61 +156,59 @@ const setRankData = (playerGroupList=[], pointList=[]) => {
     return data;
 };
 
-const getEmptyModeSet = (label) => {
+const getEmptyModeSet = (label, isCollab = false) => {
     const sample = (prefix, n) => {
         const group = [];
         for(let i=0; i<n; i++) group.push([`${prefix}ハンター${i+1}`, '武器種']);
         return group;
     };
-    return {
-        solo: setRankData([[sample(`${label}ソロ`, 1)[0]], [sample(`${label}ソロ`, 1)[0]], [sample(`${label}ソロ`, 1)[0]]], [300, 200, 100]),
+    const res = {
         tag:  setRankData([sample(`${label}タッグ`, 2), sample(`${label}タッグ`, 2), sample(`${label}タッグ`, 2)], [600, 400, 200]),
         trio: setRankData([sample(`${label}トリオ`, 3), sample(`${label}トリオ`, 3), sample(`${label}トリオ`, 3)], [900, 600, 300]),
         full: setRankData([sample(`${label}フルパ`, 4), sample(`${label}フルパ`, 4), sample(`${label}フルパ`, 4)], [1200, 800, 400])
     };
+    if (!isCollab) {
+        res.solo = setRankData([[sample(`${label}ソロ`, 1)[0]], [sample(`${label}ソロ`, 1)[0]], [sample(`${label}ソロ`, 1)[0]]], [300, 200, 100]);
+    }
+    return res;
 };
 
 const rankingData = {
     general: {
         '1h': {
-            'upd-no': {
+            'upd-no_event-no': {
                 solo: setRankData([[['チャトラ', '太刀']], [['早矢りんと', '太刀']], [['フェンリル', '双剣']]], [920, 575, 475]),
                 tag:  getEmptyModeSet('1h通').tag,
                 trio: getEmptyModeSet('1h通').trio,
                 full: getEmptyModeSet('1h通').full
             },
-            'upd-yes': getEmptyModeSet('1hア')
+            'upd-no_event-yes': getEmptyModeSet('1hイ'),
+            'upd-yes_event-no': getEmptyModeSet('1hア'),
+            'upd-yes_event-yes': getEmptyModeSet('1hア名')
         },
-        '1.5h': {
-            'upd-no': getEmptyModeSet('90分'),
-            'upd-yes': getEmptyModeSet('90分ア')
-        },
-        '2h': {
-            'upd-no': getEmptyModeSet('120分'),
-            'upd-yes': getEmptyModeSet('120分ア')
-        }
+        '1.5h': { 'upd-no_event-no': getEmptyModeSet('90分') },
+        '2h': { 'upd-no_event-no': getEmptyModeSet('120分') }
     },
     streamer_only: { 
         '1h': { 
-            'upd-no': {
+            'upd-no_event-no': {
                 solo: setRankData([[['早矢りんと', '太刀']], [['星藍こーちゃ', 'ランス']]], [1150, 675]),
                 tag:  getEmptyModeSet('配信1h').tag,
                 trio: getEmptyModeSet('配信1h').trio,
                 full: getEmptyModeSet('配信1h').full
-            },
-            'upd-yes': getEmptyModeSet('配信1hア')
+            }
         },
-        '1.5h': { 'upd-no': getEmptyModeSet('配信90'), 'upd-yes': getEmptyModeSet('配信90ア') },
-        '2h': { 'upd-no': getEmptyModeSet('配信120'), 'upd-yes': getEmptyModeSet('配信120ア') }
+        '1.5h': { 'upd-no_event-no': getEmptyModeSet('配信90') },
+        '2h': { 'upd-no_event-no': getEmptyModeSet('配信120') }
     },
     streamer_collab: { 
-        '1h': { 'upd-no': getEmptyModeSet('協力1h'), 'upd-yes': getEmptyModeSet('協力1hア') },
-        '1.5h': { 'upd-no': getEmptyModeSet('協力90'), 'upd-yes': getEmptyModeSet('協力90ア') },
-        '2h': { 'upd-no': getEmptyModeSet('協力120'), 'upd-yes': getEmptyModeSet('協力120ア') }
+        '1h': { 'upd-no_event-no': getEmptyModeSet('協力1h', true) },
+        '1.5h': { 'upd-no_event-no': getEmptyModeSet('協力90', true) },
+        '2h': { 'upd-no_event-no': getEmptyModeSet('協力120', true) }
     }
 };
 
-let state = { cat: 'general', dept: '1h', upd: 'no' };
+let state = { cat: 'general', dept: '1h', upd: 'no', event: 'no' };
 
 function update(key, value) {
     state[key] = value;
@@ -208,23 +218,43 @@ function update(key, value) {
 function render() {
     const catNames = { general:'一般部門', streamer_only:'配信者限定', streamer_collab:'配信者枠協力' };
     const deptNames = { '1h':'1時間部門', '1.5h':'90分部門', '2h':'120分部門' };
+    
+    const isCollab = state.cat === 'streamer_collab';
+
+    // 配信者枠協力のときはソロフィルターを隠す
+    document.getElementById('label-solo').classList.toggle('hidden', isCollab);
+
     document.getElementById('txt-cat').textContent = catNames[state.cat];
     document.getElementById('txt-dept').textContent = deptNames[state.dept];
-    document.getElementById('txt-opts').textContent = `アプデ${state.upd === 'yes' ? 'あり' : 'なし'}`;
+    document.getElementById('txt-opts').textContent = `アプデ${state.upd === 'yes' ? 'あり' : 'なし'} / イベクエ${state.event === 'yes' ? 'あり' : 'なし'}`;
     
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(state.cat)));
     document.querySelectorAll('.dept-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(state.dept)));
     document.querySelectorAll('.upd-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(state.upd)));
+    document.querySelectorAll('.event-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(state.event)));
 
     const area = document.getElementById('ranking-area');
     area.innerHTML = '';
-    const modes = [{id:'solo', label:'ソロ（1人）'}, {id:'tag', label:'タッグ（2人）'}, {id:'trio', label:'トリオ（3人）'}, {id:'full', label:'フルパ（4人）'}];
     
-    const dataKey = `upd-${state.upd}`;
-    const currentDataRoot = (rankingData[state.cat] && rankingData[state.cat][state.dept]) ? rankingData[state.cat][state.dept][dataKey] || getEmptyModeSet('空') : getEmptyModeSet('空');
+    // 表示するモードの定義
+    const modes = [
+        {id:'solo', label:'ソロ（1人）'}, 
+        {id:'tag', label:'タッグ（2人）'}, 
+        {id:'trio', label:'トリオ（3人）'}, 
+        {id:'full', label:'フルパ（4人）'}
+    ];
+    
+    const dataKey = `upd-${state.upd}_event-${state.event}`;
+    const currentDataRoot = (rankingData[state.cat] && rankingData[state.cat][state.dept]) 
+                            ? rankingData[state.cat][state.dept][dataKey] || getEmptyModeSet(state.event === 'yes' ? 'イベ' : '通', isCollab) 
+                            : getEmptyModeSet('空', isCollab);
 
     modes.forEach(m => {
+        // 配信者枠協力かつソロの場合は表示しない
+        if (isCollab && m.id === 'solo') return;
+        // チェックボックスがオフの場合は表示しない
         if(!document.getElementById('f-' + m.id).checked) return;
+
         let html = `<span class="mode-title">${m.label}</span><div class="table-wrapper"><table><thead><tr><th class="rank-col">順位</th><th>メンバー (名前 / 武器種)</th><th class="pts-col">ポイント</th></tr></thead><tbody>`;
         const d = currentDataRoot[m.id] || [];
         for(let i=0; i<10; i++) {
