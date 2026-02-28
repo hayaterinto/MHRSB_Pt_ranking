@@ -88,9 +88,8 @@
                 <li><strong>小型モンスター：</strong> 1体につき <span class="point-badge">5 pt</span></li>
                 <li><strong>計測：</strong> 決められた制限時間内での合計獲得ポイントを競います。</li>
                 <li><strong>禁止事項：</strong> <span style="color: #e74c3c; font-weight: bold;">闘技場クエストの使用は禁止</span> とします。</li>
-                <li><strong>アプデ防具とは：</strong> 里守武器、ギルドクロス、クロオビ装備が使用可能かどうかでランキング分けしています。</li>
-                <li><strong>イベントクエスト：</strong> イベントクエストの利用有無でランキングを分けています。</li>
-                <li><strong>配信者枠協力：</strong> 配信者とリスナーがチームで挑む部門のため、ソロ枠はありません。</li>
+                <li><strong>アプデ防具：</strong> 全装備解禁（アプデあり）と制限あり（なし）で分けています。</li>
+                <li><strong>イベントクエスト：</strong> 利用有無でランキングを分けています。</li>
             </ul>
         </div>
     </div>
@@ -157,19 +156,8 @@ const setRankData = (playerGroupList=[], pointList=[]) => {
 };
 
 const getEmptyModeSet = (label, isCollab = false) => {
-    const sample = (prefix, n) => {
-        const group = [];
-        for(let i=0; i<n; i++) group.push([`${prefix}ハンター${i+1}`, '武器種']);
-        return group;
-    };
-    const res = {
-        tag:  setRankData([sample(`${label}タッグ`, 2), sample(`${label}タッグ`, 2), sample(`${label}タッグ`, 2)], [600, 400, 200]),
-        trio: setRankData([sample(`${label}トリオ`, 3), sample(`${label}トリオ`, 3), sample(`${label}トリオ`, 3)], [900, 600, 300]),
-        full: setRankData([sample(`${label}フルパ`, 4), sample(`${label}フルパ`, 4), sample(`${label}フルパ`, 4)], [1200, 800, 400])
-    };
-    if (!isCollab) {
-        res.solo = setRankData([[sample(`${label}ソロ`, 1)[0]], [sample(`${label}ソロ`, 1)[0]], [sample(`${label}ソロ`, 1)[0]]], [300, 200, 100]);
-    }
+    const res = { tag: setRankData([], []), trio: setRankData([], []), full: setRankData([], []) };
+    if (!isCollab) res.solo = setRankData([], []);
     return res;
 };
 
@@ -184,7 +172,12 @@ const rankingData = {
             },
             'upd-no_event-yes': getEmptyModeSet('1hイ'),
             'upd-yes_event-no': getEmptyModeSet('1hア'),
-            'upd-yes_event-yes': getEmptyModeSet('1hア名')
+            'upd-yes_event-yes': {
+                solo: setRankData([[['チャト', '太刀']], [['早矢りんと', 'ハンマー']]], [5600, 1330]),
+                tag:  getEmptyModeSet('1hア名').tag,
+                trio: getEmptyModeSet('1hア名').trio,
+                full: getEmptyModeSet('1hア名').full
+            }
         },
         '1.5h': { 'upd-no_event-no': getEmptyModeSet('90分') },
         '2h': { 'upd-no_event-no': getEmptyModeSet('120分') }
@@ -197,14 +190,10 @@ const rankingData = {
                 trio: getEmptyModeSet('配信1h').trio,
                 full: getEmptyModeSet('配信1h').full
             }
-        },
-        '1.5h': { 'upd-no_event-no': getEmptyModeSet('配信90') },
-        '2h': { 'upd-no_event-no': getEmptyModeSet('配信120') }
+        }
     },
     streamer_collab: { 
-        '1h': { 'upd-no_event-no': getEmptyModeSet('協力1h', true) },
-        '1.5h': { 'upd-no_event-no': getEmptyModeSet('協力90', true) },
-        '2h': { 'upd-no_event-no': getEmptyModeSet('協力120', true) }
+        '1h': { 'upd-no_event-no': getEmptyModeSet('協力1h', true) }
     }
 };
 
@@ -218,12 +207,9 @@ function update(key, value) {
 function render() {
     const catNames = { general:'一般部門', streamer_only:'配信者限定', streamer_collab:'配信者枠協力' };
     const deptNames = { '1h':'1時間部門', '1.5h':'90分部門', '2h':'120分部門' };
-    
     const isCollab = state.cat === 'streamer_collab';
 
-    // 配信者枠協力のときはソロフィルターを隠す
     document.getElementById('label-solo').classList.toggle('hidden', isCollab);
-
     document.getElementById('txt-cat').textContent = catNames[state.cat];
     document.getElementById('txt-dept').textContent = deptNames[state.dept];
     document.getElementById('txt-opts').textContent = `アプデ${state.upd === 'yes' ? 'あり' : 'なし'} / イベクエ${state.event === 'yes' ? 'あり' : 'なし'}`;
@@ -235,26 +221,13 @@ function render() {
 
     const area = document.getElementById('ranking-area');
     area.innerHTML = '';
-    
-    // 表示するモードの定義
-    const modes = [
-        {id:'solo', label:'ソロ（1人）'}, 
-        {id:'tag', label:'タッグ（2人）'}, 
-        {id:'trio', label:'トリオ（3人）'}, 
-        {id:'full', label:'フルパ（4人）'}
-    ];
-    
+    const modes = [{id:'solo', label:'ソロ（1人）'}, {id:'tag', label:'タッグ（2人）'}, {id:'trio', label:'トリオ（3人）'}, {id:'full', label:'フルパ（4人）'}];
     const dataKey = `upd-${state.upd}_event-${state.event}`;
-    const currentDataRoot = (rankingData[state.cat] && rankingData[state.cat][state.dept]) 
-                            ? rankingData[state.cat][state.dept][dataKey] || getEmptyModeSet(state.event === 'yes' ? 'イベ' : '通', isCollab) 
-                            : getEmptyModeSet('空', isCollab);
+    const currentDataRoot = (rankingData[state.cat] && rankingData[state.cat][state.dept]) ? rankingData[state.cat][state.dept][dataKey] || getEmptyModeSet('空', isCollab) : getEmptyModeSet('空', isCollab);
 
     modes.forEach(m => {
-        // 配信者枠協力かつソロの場合は表示しない
         if (isCollab && m.id === 'solo') return;
-        // チェックボックスがオフの場合は表示しない
         if(!document.getElementById('f-' + m.id).checked) return;
-
         let html = `<span class="mode-title">${m.label}</span><div class="table-wrapper"><table><thead><tr><th class="rank-col">順位</th><th>メンバー (名前 / 武器種)</th><th class="pts-col">ポイント</th></tr></thead><tbody>`;
         const d = currentDataRoot[m.id] || [];
         for(let i=0; i<10; i++) {
