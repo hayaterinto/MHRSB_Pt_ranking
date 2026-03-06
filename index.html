@@ -5,14 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>モンハンサンブレイクポイントランキング！</title>
     <style>
-        /* 基本設定 */
+        /* --- デザイン保持 --- */
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #121212; color: #ecf0f1; padding: 10px; margin: 0; }
         .container { max-width: 1000px; margin: 20px auto; background: #2c3e50; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
         .header-area { text-align: center; margin-bottom: 20px; }
         h1 { color: #f1c40f; font-size: 1.8em; margin: 0; text-shadow: 2px 2px 4px #000; }
         .sub-title { color: #e67e22; font-size: 1.5em; font-weight: bold; display: block; margin-top: 5px; }
-
-        /* ルールエリア（トグル） */
         .rule-container { background: #34495e; border: 2px solid #e67e22; border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
         .rule-header { background: #e67e22; color: white; padding: 10px; cursor: pointer; font-weight: bold; text-align: center; display: flex; justify-content: center; align-items: center; }
         .rule-header::after { content: '▲'; margin-left: 10px; transition: 0.3s; }
@@ -23,7 +21,6 @@
         .rule-list li { margin-bottom: 8px; padding-left: 1.5em; position: relative; }
         .rule-list li::before { content: '◈'; position: absolute; left: 0; color: #f1c40f; }
         .point-badge { background: #e74c3c; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
-
         .nav-link-area { text-align: center; margin-bottom: 20px; }
         .btn-calc-link { display: inline-block; background-color: #ff8800; color: white; padding: 12px 24px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 15px rgba(255, 136, 0, 0.4); border: 2px solid #ffffff; transition: 0.2s; }
         .tabs, .sub-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; justify-content: center; }
@@ -35,37 +32,28 @@
         .option-group { margin: 10px 0; }
         .option-label { display: block; font-size: 0.85em; color: #bdc3c7; margin-bottom: 5px; }
         .filter-area { background: #2c3e50; padding: 10px; text-align: center; border-radius: 5px; margin-bottom: 20px; font-size: 14px; }
-        .filter-area label { margin: 0 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
-        .filter-area label.hidden { display: none; }
         #display-title { text-align: center; margin: 20px 0; }
         .current-cat-name { display: block; font-size: 1em; color: #bdc3c7; }
         .current-dept-name { display: block; font-size: 1.8em; color: #f39c12; font-weight: bold; }
         .current-options { color: #f1c40f; font-size: 1em; margin-top: 5px; }
         .mode-title { text-align: center; font-size: 1.5em; font-weight: bold; margin: 30px 0 10px 0; display: block; color: #fff; border-left: 5px solid #e67e22; border-right: 5px solid #e67e22; }
-        
         .table-wrapper { overflow-x: hidden; margin-bottom: 30px; }
         table { width: 100%; border-collapse: collapse; background: #fff; color: #333; border-radius: 5px; overflow: hidden; table-layout: fixed; }
-        th, td { padding: 10px 5px; border: 1px solid #bdc3c7; text-align: center; font-size: 14px; font-weight: bold; word-break: break-all; }
+        th, td { padding: 10px 5px; border: 1px solid #bdc3c7; text-align: center; font-size: 13px; font-weight: bold; word-break: break-all; }
         th { background: #34495e; color: white; }
-        .rank-col { width: 60px; }
-        .pts-col { width: 90px; }
-        
-        .member-row { display: flex; border-bottom: 1px solid #eee; padding: 4px 0; align-items: center; }
+        .rank-col { width: 55px; }
+        .pts-col { width: 85px; }
+        .member-row { display: flex; border-bottom: 1px solid #eee; padding: 4px 0; align-items: center; flex-wrap: wrap; }
         .member-row:last-child { border-bottom: none; }
-        .m-name { flex: 1; text-align: center; border-right: 1px solid #eee; }
-        .m-wep { flex: 1; text-align: center; color: #555; font-size: 0.9em; }
-        
-        .rank-1 { background: #fff4d1; } 
-        .rank-2 { background: #f0f0f0; } 
-        .rank-3 { background: #ffebd1; }
+        .m-date { flex: 1; text-align: center; color: #888; font-size: 0.75em; border-right: 1px solid #eee; }
+        .m-name { flex: 1.5; text-align: center; border-right: 1px solid #eee; }
+        .m-wep { flex: 1; text-align: center; color: #555; font-size: 0.85em; }
+        .rank-1 { background: #fff4d1; } .rank-2 { background: #f0f0f0; } .rank-3 { background: #ffebd1; }
 
-        @media screen and (max-width: 480px) {
-            h1 { font-size: 1.4em; }
-            .sub-title { font-size: 1.2em; }
-            th, td { font-size: 12px; padding: 5px 2px; }
-            .rank-col { width: 45px; }
-            .pts-col { width: 70px; }
-        }
+        /* --- 管理者用スタイル --- */
+        .admin-footer { margin-top: 50px; text-align: center; border-top: 1px solid #444; padding: 20px; }
+        .admin-input { width: 95%; background: #333; color: #fff; border: 1px solid #555; padding: 4px; text-align: center; font-weight: bold; font-size: 11px; }
+        .save-banner { position: fixed; bottom: 20px; right: 20px; background: #27ae60; color: white; padding: 15px 25px; border-radius: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); cursor: pointer; display: none; z-index: 1000; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -81,15 +69,12 @@
     </div>
 
     <div class="rule-container" id="ruleBox">
-        <div class="rule-header" onclick="toggleRules()">🏆 ポイントランキング ルール（クリックで開閉）</div>
+        <div class="rule-header" onclick="toggleRules()">🏆 ポイントランキング ルール</div>
         <div class="rule-content">
             <ul class="rule-list">
                 <li><strong>大型モンスター：</strong> 危険度 × <span class="point-badge">100 pt</span></li>
                 <li><strong>小型モンスター：</strong> 1体につき <span class="point-badge">5 pt</span></li>
-                <li><strong>計測：</strong> 決められた制限時間内での合計獲得ポイントを競います。</li>
-                <li><strong>禁止事項：</strong> <span style="color: #e74c3c; font-weight: bold;">闘技場クエストの使用は禁止</span> とします。</li>
-                <li><strong>アプデ防具：</strong> 全装備解禁（アプデあり）と制限あり（なし）で分けています。</li>
-                <li><strong>イベントクエスト：</strong> 利用有無でランキングを分けています。</li>
+                <li><strong>禁止事項：</strong> <span style="color: #e74c3c; font-weight: bold;">闘技場クエストの使用は禁止</span></li>
             </ul>
         </div>
     </div>
@@ -128,10 +113,10 @@
     </div>
 
     <div class="filter-area">
-        <label id="label-solo"><input type="checkbox" checked onchange="render()" id="f-solo"> ソロ</label>
-        <label id="label-tag"><input type="checkbox" checked onchange="render()" id="f-tag"> タッグ</label>
-        <label id="label-trio"><input type="checkbox" checked onchange="render()" id="f-trio"> トリオ</label>
-        <label id="label-full"><input type="checkbox" checked onchange="render()" id="f-full"> フルパ</label>
+        <label><input type="checkbox" checked onchange="render()" id="f-solo"> ソロ</label>
+        <label><input type="checkbox" checked onchange="render()" id="f-tag"> タッグ</label>
+        <label><input type="checkbox" checked onchange="render()" id="f-trio"> トリオ</label>
+        <label><input type="checkbox" checked onchange="render()" id="f-full"> フルパ</label>
     </div>
 
     <div id="display-title">
@@ -143,77 +128,75 @@
     <div id="ranking-area"></div>
 </div>
 
+<div class="admin-footer">
+    <button onclick="adminLogin()" style="color:#444; border:none; background:none; font-size:10px;">⚙ 管理者ログイン</button>
+</div>
+
+<div id="saveBtn" class="save-banner" onclick="saveAll()">💾 変更を保存する</div>
+
 <script>
-function toggleRules() {
-    document.getElementById('ruleBox').classList.toggle('closed');
-}
+let isAdmin = false;
 
-const setRankData = (playerGroupList=[], pointList=[]) => {
-    const data = Array(10).fill(null).map(() => ({ players: [], pts: 0 }));
-    pointList.forEach((pt, i) => { if(i < 10) data[i].pts = pt; });
-    playerGroupList.forEach((group, i) => { if(i < 10) data[i].players = group; });
-    return data;
-};
-
-const getEmptyModeSet = (label, isCollab = false) => {
-    const res = { tag: setRankData([], []), trio: setRankData([], []), full: setRankData([], []) };
-    if (!isCollab) res.solo = setRankData([], []);
-    return res;
-};
-
-const rankingData = {
+// --- 初期データ構造 (各メンバー情報に[名前, 武器, 実施日]を持たせる) ---
+const defaultData = {
     general: {
         '1h': {
-            'upd-no_event-no': {
-                solo: setRankData([[['チャト', '太刀']], [['早矢りんと', '太刀']], [['フェンリル', '双剣']]], [920, 575, 475]),
-                tag:  getEmptyModeSet('1h通').tag,
-                trio: getEmptyModeSet('1h通').trio,
-                full: getEmptyModeSet('1h通').full
-            },
-            'upd-no_event-yes': getEmptyModeSet('1hイ'),
-            'upd-yes_event-no': getEmptyModeSet('1hア'),
-            'upd-yes_event-yes': {
-                solo: setRankData([[['チャト', '太刀']], [['早矢りんと', 'ハンマー']]], [5600, 1330]),
-                tag:  getEmptyModeSet('1hア名').tag,
-                trio: getEmptyModeSet('1hア名').trio,
-                full: getEmptyModeSet('1hア名').full
-            }
-        },
-        '1.5h': { 'upd-no_event-no': getEmptyModeSet('90分') },
-        '2h': { 'upd-no_event-no': getEmptyModeSet('120分') }
-    },
-    streamer_only: { 
-        '1h': { 
-            'upd-no_event-no': {
-                solo: setRankData([[['早矢りんと', '太刀']], [['星藍こーちゃ', 'ランス']]], [1150, 645]),
-                tag:  getEmptyModeSet('配信1h').tag,
-                trio: getEmptyModeSet('配信1h').trio,
-                full: getEmptyModeSet('配信1h').full
-            }
+            'upd-no_event-no': { solo: [[['チャト', '太刀', '---'], 920], [['早矢りんと', '太刀', '---'], 575], [['フェンリル', '双剣', '---'], 475]] },
+            'upd-yes_event-yes': { solo: [[['チャト', '太刀', '---'], 5600], [['早矢りんと', 'ハンマー', '---'], 1330]] }
         }
     },
-    streamer_collab: { 
-        '1h': { 'upd-no_event-no': getEmptyModeSet('協力1h', true) }
+    streamer_only: {
+        '1h': {
+            'upd-no_event-no': { solo: [[['早矢りんと', '太刀', '---'], 1150], [['星藍こーちゃ', 'ランス', '---'], 645]] }
+        }
     }
 };
 
+let rankingData = JSON.parse(localStorage.getItem('mh_rank_v5')) || defaultData;
 let state = { cat: 'general', dept: '1h', upd: 'no', event: 'no' };
+
+function toggleRules() { document.getElementById('ruleBox').classList.toggle('closed'); }
+
+function adminLogin() {
+    if(prompt('パスワード') === '88001100') {
+        isAdmin = true;
+        document.getElementById('saveBtn').style.display = 'block';
+        alert('管理者モード：実施日・名前・武器・ポイントを直接編集できます');
+        render();
+    }
+}
 
 function update(key, value) {
     state[key] = value;
     render();
 }
 
+function saveAll() {
+    localStorage.setItem('mh_rank_v5', JSON.stringify(rankingData));
+    alert('保存完了しました！');
+}
+
+function editVal(mode, rankIdx, field, val) {
+    const dataKey = `upd-${state.upd}_event-${state.event}`;
+    if(!rankingData[state.cat][state.dept]) rankingData[state.cat][state.dept] = {};
+    if(!rankingData[state.cat][state.dept][dataKey]) rankingData[state.cat][state.dept][dataKey] = {};
+    if(!rankingData[state.cat][state.dept][dataKey][mode]) rankingData[state.cat][state.dept][dataKey][mode] = [];
+    
+    const targetList = rankingData[state.cat][state.dept][dataKey][mode];
+    if(!targetList[rankIdx]) targetList[rankIdx] = [['---', '---', '---'], 0];
+    
+    if(field === 'name') targetList[rankIdx][0][0] = val;
+    if(field === 'wep') targetList[rankIdx][0][1] = val;
+    if(field === 'date') targetList[rankIdx][0][2] = val;
+    if(field === 'pt') targetList[rankIdx][1] = parseInt(val) || 0;
+}
+
 function render() {
     const catNames = { general:'一般部門', streamer_only:'配信者限定', streamer_collab:'配信者枠協力' };
-    const deptNames = { '1h':'1時間部門', '1.5h':'90分部門', '2h':'120分部門' };
-    const isCollab = state.cat === 'streamer_collab';
-
-    document.getElementById('label-solo').classList.toggle('hidden', isCollab);
     document.getElementById('txt-cat').textContent = catNames[state.cat];
-    document.getElementById('txt-dept').textContent = deptNames[state.dept];
+    document.getElementById('txt-dept').textContent = state.dept + '部門';
     document.getElementById('txt-opts').textContent = `アプデ${state.upd === 'yes' ? 'あり' : 'なし'} / イベクエ${state.event === 'yes' ? 'あり' : 'なし'}`;
-    
+
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(state.cat)));
     document.querySelectorAll('.dept-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(state.dept)));
     document.querySelectorAll('.upd-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(state.upd)));
@@ -221,28 +204,42 @@ function render() {
 
     const area = document.getElementById('ranking-area');
     area.innerHTML = '';
-    const modes = [{id:'solo', label:'ソロ（1人）'}, {id:'tag', label:'タッグ（2人）'}, {id:'trio', label:'トリオ（3人）'}, {id:'full', label:'フルパ（4人）'}];
+    const modes = [{id:'solo', label:'ソロ'}, {id:'tag', label:'タッグ'}, {id:'trio', label:'トリオ'}, {id:'full', label:'フルパ'}];
     const dataKey = `upd-${state.upd}_event-${state.event}`;
-    const currentDataRoot = (rankingData[state.cat] && rankingData[state.cat][state.dept]) ? rankingData[state.cat][state.dept][dataKey] || getEmptyModeSet('空', isCollab) : getEmptyModeSet('空', isCollab);
 
     modes.forEach(m => {
-        if (isCollab && m.id === 'solo') return;
         if(!document.getElementById('f-' + m.id).checked) return;
-        let html = `<span class="mode-title">${m.label}</span><div class="table-wrapper"><table><thead><tr><th class="rank-col">順位</th><th>メンバー (名前 / 武器種)</th><th class="pts-col">ポイント</th></tr></thead><tbody>`;
-        const d = currentDataRoot[m.id] || [];
+        const currentList = (rankingData[state.cat][state.dept] && rankingData[state.cat][state.dept][dataKey]) 
+                        ? rankingData[state.cat][state.dept][dataKey][m.id] || [] : [];
+
+        let html = `<span class="mode-title">${m.label}</span>`;
+        html += `<div class="table-wrapper"><table><thead><tr><th class="rank-col">順位</th><th>メンバー (実施日 / 名前 / 武器)</th><th class="pts-col">ポイント</th></tr></thead><tbody>`;
+        
         for(let i=0; i<10; i++) {
-            const row = d[i] || { players: [], pts: 0 };
-            const rank = i+1;
-            const cls = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'';
-            html += `<tr class="${cls}"><td>${rank}位</td><td>`;
-            if(row.players.length === 0) {
-                html += `<div class="member-row"><div class="m-name">---</div><div class="m-wep">---</div></div>`;
+            const row = currentList[i] || [['---', '---', '---'], 0];
+            const cls = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+            
+            html += `<tr class="${cls}"><td>${i+1}位</td><td>`;
+            if(isAdmin) {
+                html += `<div class="member-row">
+                    <input type="text" title="実施日" class="admin-input" style="flex:1" value="${row[0][2]}" onchange="editVal('${m.id}', ${i}, 'date', this.value)">
+                    <input type="text" title="名前" class="admin-input" style="flex:1.5" value="${row[0][0]}" onchange="editVal('${m.id}', ${i}, 'name', this.value)">
+                    <input type="text" title="武器" class="admin-input" style="flex:1" value="${row[0][1]}" onchange="editVal('${m.id}', ${i}, 'wep', this.value)">
+                </div>`;
             } else {
-                row.players.forEach(p => {
-                    html += `<div class="member-row"><div class="m-name">${p[0]}</div><div class="m-wep">${p[1]}</div></div>`;
-                });
+                html += `<div class="member-row">
+                    <div class="m-date">${row[0][2]}</div>
+                    <div class="m-name">${row[0][0]}</div>
+                    <div class="m-wep">${row[0][1]}</div>
+                </div>`;
             }
-            html += `</td><td>${row.pts > 0 ? row.pts.toLocaleString() + ' pt' : '---'}</td></tr>`;
+            html += `</td><td>`;
+            if(isAdmin) {
+                html += `<input type="number" class="admin-input" value="${row[1]}" onchange="editVal('${m.id}', ${i}, 'pt', this.value)">`;
+            } else {
+                html += row[1] > 0 ? row[1].toLocaleString() + ' pt' : '---';
+            }
+            html += `</td></tr>`;
         }
         html += `</tbody></table></div>`;
         area.innerHTML += html;
