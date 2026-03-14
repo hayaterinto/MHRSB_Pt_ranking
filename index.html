@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>モンハンサンブレイクポイントランキング！</title>
     <style>
-        /* --- デザイン保持 --- */
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #121212; color: #ecf0f1; padding: 10px; margin: 0; }
         .container { max-width: 1000px; margin: 20px auto; background: #2c3e50; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
         .header-area { text-align: center; margin-bottom: 20px; }
@@ -44,16 +43,10 @@
         .rank-col { width: 55px; }
         .pts-col { width: 85px; }
         .member-row { display: flex; border-bottom: 1px solid #eee; padding: 4px 0; align-items: center; flex-wrap: wrap; }
-        .member-row:last-child { border-bottom: none; }
         .m-date { flex: 1; text-align: center; color: #888; font-size: 0.75em; border-right: 1px solid #eee; }
         .m-name { flex: 1.5; text-align: center; border-right: 1px solid #eee; }
         .m-wep { flex: 1; text-align: center; color: #555; font-size: 0.85em; }
         .rank-1 { background: #fff4d1; } .rank-2 { background: #f0f0f0; } .rank-3 { background: #ffebd1; }
-
-        /* --- 管理者用スタイル --- */
-        .admin-footer { margin-top: 50px; text-align: center; border-top: 1px solid #444; padding: 20px; }
-        .admin-input { width: 95%; background: #333; color: #fff; border: 1px solid #555; padding: 4px; text-align: center; font-weight: bold; font-size: 11px; }
-        .save-banner { position: fixed; bottom: 20px; right: 20px; background: #27ae60; color: white; padding: 15px 25px; border-radius: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); cursor: pointer; display: none; z-index: 1000; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -128,17 +121,9 @@
     <div id="ranking-area"></div>
 </div>
 
-<div class="admin-footer">
-    <button onclick="adminLogin()" style="color:#444; border:none; background:none; font-size:10px;">⚙ 管理者ログイン</button>
-</div>
-
-<div id="saveBtn" class="save-banner" onclick="saveAll()">💾 変更を保存する</div>
-
 <script>
-let isAdmin = false;
-
-// --- 初期データ構造 (各メンバー情報に[名前, 武器, 実施日]を持たせる) ---
-const defaultData = {
+// --- 管理者機能を削除した、閲覧専用の固定データ ---
+const rankingData = {
     general: {
         '1h': {
             'upd-no_event-no': { solo: [[['チャト', '太刀', '---'], 920], [['早矢りんと', '太刀', '---'], 575], [['フェンリル', '双剣', '---'], 475]] },
@@ -147,48 +132,33 @@ const defaultData = {
     },
     streamer_only: {
         '1h': {
-            'upd-no_event-no': { solo: [[['早矢りんと', '太刀', '---'], 1150], [['星藍こーちゃ', 'ランス', '---'], 645]] }
+            'upd-no_event-no': { 
+                solo: [
+                    [['早矢りんと', '太刀', '2026.2/21'], 1150], 
+                    [['星藍こーちゃ', 'ランス', '2026.2/21'], 645]
+                ] 
+            },
+            'upd-yes_event-no': { 
+                solo: [
+                    [['早矢りんと', 'スラッシュアックス', '2026.3/14'], 1780], 
+                    [['ネット海のホトリ', 'ライトボウガン', '2026.3/14'], 1370], 
+                    [['星藍こーちゃ', 'ランス', '2026.3/14'], 1020]
+                ] 
+            }
         }
     }
 };
 
-let rankingData = JSON.parse(localStorage.getItem('mh_rank_v5')) || defaultData;
+// 編集データが邪魔をしないよう、localStorageの使用を停止
+localStorage.removeItem('mh_rank_v5');
+
 let state = { cat: 'general', dept: '1h', upd: 'no', event: 'no' };
 
 function toggleRules() { document.getElementById('ruleBox').classList.toggle('closed'); }
 
-function adminLogin() {
-    if(prompt('パスワード') === '88001100') {
-        isAdmin = true;
-        document.getElementById('saveBtn').style.display = 'block';
-        alert('管理者モード：実施日・名前・武器・ポイントを直接編集できます');
-        render();
-    }
-}
-
 function update(key, value) {
     state[key] = value;
     render();
-}
-
-function saveAll() {
-    localStorage.setItem('mh_rank_v5', JSON.stringify(rankingData));
-    alert('保存完了しました！');
-}
-
-function editVal(mode, rankIdx, field, val) {
-    const dataKey = `upd-${state.upd}_event-${state.event}`;
-    if(!rankingData[state.cat][state.dept]) rankingData[state.cat][state.dept] = {};
-    if(!rankingData[state.cat][state.dept][dataKey]) rankingData[state.cat][state.dept][dataKey] = {};
-    if(!rankingData[state.cat][state.dept][dataKey][mode]) rankingData[state.cat][state.dept][dataKey][mode] = [];
-    
-    const targetList = rankingData[state.cat][state.dept][dataKey][mode];
-    if(!targetList[rankIdx]) targetList[rankIdx] = [['---', '---', '---'], 0];
-    
-    if(field === 'name') targetList[rankIdx][0][0] = val;
-    if(field === 'wep') targetList[rankIdx][0][1] = val;
-    if(field === 'date') targetList[rankIdx][0][2] = val;
-    if(field === 'pt') targetList[rankIdx][1] = parseInt(val) || 0;
 }
 
 function render() {
@@ -197,10 +167,10 @@ function render() {
     document.getElementById('txt-dept').textContent = state.dept + '部門';
     document.getElementById('txt-opts').textContent = `アプデ${state.upd === 'yes' ? 'あり' : 'なし'} / イベクエ${state.event === 'yes' ? 'あり' : 'なし'}`;
 
-    document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(state.cat)));
-    document.querySelectorAll('.dept-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(state.dept)));
-    document.querySelectorAll('.upd-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(state.upd)));
-    document.querySelectorAll('.event-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(state.event)));
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(`'${state.cat}'`)));
+    document.querySelectorAll('.dept-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(`'${state.dept}'`)));
+    document.querySelectorAll('.upd-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(`'${state.upd}'`)));
+    document.querySelectorAll('.event-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(`'${state.event}'`)));
 
     const area = document.getElementById('ranking-area');
     area.innerHTML = '';
@@ -209,7 +179,7 @@ function render() {
 
     modes.forEach(m => {
         if(!document.getElementById('f-' + m.id).checked) return;
-        const currentList = (rankingData[state.cat][state.dept] && rankingData[state.cat][state.dept][dataKey]) 
+        const currentList = (rankingData[state.cat] && rankingData[state.cat][state.dept] && rankingData[state.cat][state.dept][dataKey]) 
                         ? rankingData[state.cat][state.dept][dataKey][m.id] || [] : [];
 
         let html = `<span class="mode-title">${m.label}</span>`;
@@ -219,27 +189,13 @@ function render() {
             const row = currentList[i] || [['---', '---', '---'], 0];
             const cls = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
             
-            html += `<tr class="${cls}"><td>${i+1}位</td><td>`;
-            if(isAdmin) {
-                html += `<div class="member-row">
-                    <input type="text" title="実施日" class="admin-input" style="flex:1" value="${row[0][2]}" onchange="editVal('${m.id}', ${i}, 'date', this.value)">
-                    <input type="text" title="名前" class="admin-input" style="flex:1.5" value="${row[0][0]}" onchange="editVal('${m.id}', ${i}, 'name', this.value)">
-                    <input type="text" title="武器" class="admin-input" style="flex:1" value="${row[0][1]}" onchange="editVal('${m.id}', ${i}, 'wep', this.value)">
-                </div>`;
-            } else {
-                html += `<div class="member-row">
+            html += `<tr class="${cls}"><td>${i+1}位</td><td>
+                <div class="member-row">
                     <div class="m-date">${row[0][2]}</div>
                     <div class="m-name">${row[0][0]}</div>
                     <div class="m-wep">${row[0][1]}</div>
-                </div>`;
-            }
-            html += `</td><td>`;
-            if(isAdmin) {
-                html += `<input type="number" class="admin-input" value="${row[1]}" onchange="editVal('${m.id}', ${i}, 'pt', this.value)">`;
-            } else {
-                html += row[1] > 0 ? row[1].toLocaleString() + ' pt' : '---';
-            }
-            html += `</td></tr>`;
+                </div>
+            </td><td>${row[1] > 0 ? row[1].toLocaleString() + ' pt' : '---'}</td></tr>`;
         }
         html += `</tbody></table></div>`;
         area.innerHTML += html;
